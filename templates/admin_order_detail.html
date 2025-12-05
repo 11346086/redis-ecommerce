@@ -20,7 +20,7 @@
         name="status"
         style="border-radius:999px; padding:4px 8px; border:1px solid #fecaca; font-size:13px;"
       >
-        {% for s in ["已接單", "已撿貨", "已出貨"] %}
+        {% for s in ["已建立", "已撿貨", "已出貨"] %}
           <option value="{{ s }}" {% if order.status == s %}selected{% endif %}>
             {{ s }}
           </option>
@@ -53,8 +53,22 @@
     </tbody>
     <tfoot>
       <tr>
-        <td colspan="4" class="text-right" style="font-weight:600;">訂單金額</td>
-        <td class="text-right" style="font-weight:600;">${{ total }}</td>
+        <td colspan="4" class="text-right">商品金額小計：</td>
+        <td class="text-right">${{ items_total }}</td>
+      </tr>
+      <tr>
+        <td colspan="4" class="text-right">運費：</td>
+        <td class="text-right">
+          {% if shipping_fee == 0 %}
+            免運
+          {% else %}
+            ${{ shipping_fee }}
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4" class="text-right" style="font-weight:600;">訂單金額：</td>
+        <td class="text-right" style="font-weight:600;">${{ grand_total }}</td>
       </tr>
     </tfoot>
   </table>

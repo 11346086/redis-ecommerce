@@ -1,10 +1,54 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+  {# ✅ 跑馬燈的 CSS，可以直接放在 body 裡沒關係 #}
+  <style>
+    .cart-banner {
+      margin: 4px 0 10px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 13px;
+      color: #f97373;  /* 跑馬燈文字顏色（粉紅） */
+      text-align: left;
+    }
+
+    .cart-marquee {
+      display: inline-block;
+      animation: cart-marquee 16s linear infinite;
+    }
+
+    .cart-marquee span {
+      padding-right: 3rem;  /* 兩段文字之間的距離 */
+    }
+
+    @keyframes cart-marquee {
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+
+  {# ✅ 只有「有商品時」才顯示跑馬燈 #}
+  {% if items %}
+    <div class="cart-banner">
+      <div class="cart-marquee">
+        {% if total < SHIPPING_THRESHOLD %}
+          {# 未達門檻：提示還差多少就免運 #}
+          <span>再買 {{ SHIPPING_THRESHOLD - total }} 元就免運費啦～ 🛒 把喜歡的零食多帶幾樣吧！</span>
+          <span>再買 {{ SHIPPING_THRESHOLD - total }} 元就免運費啦～ 🛒 把喜歡的零食多帶幾樣吧！</span>
+        {% else %}
+          {# 已經達到免運門檻 #}
+          <span>現在已經達到 {{ SHIPPING_THRESHOLD }} 元免運費門檻～ 🎉 把喜歡的零食通通加進購物車吧！</span>
+          <span>現在已經達到 {{ SHIPPING_THRESHOLD }} 元免運費門檻～ 🎉 把喜歡的零食通通加進購物車吧！</span>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
   {% if not items %}
     <div style="text-align:center; padding:40px 0;">
-      <p style="font-size:18px; margin-bottom:8px;">購物車是空的～</p>
-      <p class="text-muted" style="margin-bottom:16px;">去逛逛零食區，選幾樣喜歡的再回來結帳吧 😋</p>
+      <p style="font-size:22px; margin-bottom:8px;">購物車是空的～</p>
+      <p class="text-muted" style="margin-bottom:20px;">去逛逛零食區，選幾樣喜歡的再回來結帳吧 😋</p>
       <a href="{{ url_for('products') }}" class="btn btn-primary">前往商品列表</a>
     </div>
   {% else %}
@@ -91,9 +135,6 @@
             {% endif %}
           </span>
         </div>
-        <div style="font-size:13px; color:#ef4444; font-weight:bold; margin-bottom:10px;">        
-          滿 ${{ SHIPPING_THRESHOLD }} 元享免運優惠
-        </div>
         <div style="font-size:16px; font-weight:700; margin-bottom:14px; display:flex; justify-content:space-between;">        
           <span>應付金額</span>
           <span>${{ grand_total }}</span>
@@ -109,5 +150,6 @@
           </a>
         </div>
       </div>
+    </div>
   {% endif %}
 {% endblock %}

@@ -343,8 +343,8 @@ def profile_setup():
     # GET：顯示首頁（歡迎 + 註冊 + 登入）
     return render_template(
         "profile_setup.html",
-        title="歡迎來到甜蜜魔法零食小舖",
-        subtitle="購買專屬你的療癒魔法！",
+        title="🍬歡迎來到甜蜜魔法零食小舖🛒",
+        subtitle="購買專屬你的療癒魔法！🪄✨",
     )
 
     # GET：顯示表單
@@ -399,11 +399,21 @@ def profile():
         if not od:
             continue
 
-        # 解析總金額
+        # 解析「商品金額小計」（checkout 時存的 total）
         try:
-            total = int(od.get("total", 0))
+            items_total = int(od.get("total", 0))
         except ValueError:
-            total = 0
+            items_total = 0
+
+        # 運費：跟 cart() 一樣的規則
+        if items_total == 0:
+            shipping_fee = 0
+        elif items_total >= SHIPPING_THRESHOLD:
+            shipping_fee = 0
+        else:
+            shipping_fee = SHIPPING_FEE
+
+        grand_total = items_total + shipping_fee
 
         # 解析商品數量
         items_json = od.get("items", "{}")
@@ -416,9 +426,11 @@ def profile():
         orders.append(
             {
                 "id": oid,
-                "total": total,
+                "items_total": items_total,      # 商品小計（純商品）
+                "shipping_fee": shipping_fee,    # 運費
+                "grand_total": grand_total,      # ✅ 含運費的應付金額
                 "created_at": od.get("created_at", ""),
-                "status": od.get("status", "created"),
+                "status": od.get("status", "已建立"),
                 "items_count": items_count,
             }
         )
@@ -543,7 +555,7 @@ def order_detail(order_id):
         items_dict = {}
 
     items = []
-    total = 0
+    items_total = 0
     for pid, qty_str in items_dict.items():
         try:
             qty = int(qty_str)
@@ -562,7 +574,7 @@ def order_detail(order_id):
                 price = 0
 
         subtotal = price * qty
-        total += subtotal
+        items_total += subtotal
 
         items.append(
             {
@@ -574,11 +586,22 @@ def order_detail(order_id):
             }
         )
 
-    # 保險：如果 hash 裡的 total 跟重新算的不一樣，畫面就以重新計算的為準
-    try:
-        recorded_total = int(od.get("total", total))
-    except ValueError:
-        recorded_total = total
+    # 運費：跟 cart() 使用相同規則
+    if items_total == 0:
+        shipping_fee = 0
+    elif items_total >= SHIPPING_THRESHOLD:
+        shipping_fee = 0
+    else:
+        shipping_fee = SHIPPING_FEE
+
+    grand_total = items_total + shipping_fee
+
+    # 如果之後你有把「應付金額」存進 hash，就可以這樣讀：
+    # try:
+    #     recorded_total = int(od.get("total", grand_total))
+    # except ValueError:
+    #     recorded_total = grand_total
+    # 現在先不用也沒關係
 
     return render_template(
         "order_detail.html",
@@ -587,9 +610,11 @@ def order_detail(order_id):
         order_id=order_id,
         order=od,
         items=items,
-        total=total,
-        recorded_total=recorded_total,
+        items_total=items_total,
+        shipping_fee=shipping_fee,
+        grand_total=grand_total,
     )
+
 
 
 @app.route("/")
@@ -884,7 +909,7 @@ def checkout():
                 "user_id": user_id,
                 "items": json.dumps(cart_items),
                 "total": str(total),
-                "status": "created",
+                "status": "已建立",
                 "created_at": datetime.now().isoformat(timespec="seconds"),
             }
 
@@ -958,32 +983,6 @@ def seckill_join():
         flash("搶購時發生未知錯誤。", "error")
 
     return redirect(url_for("seckill"))
-
-# @app.route("/login", methods=["GET", "POST"])
-# def login():
-#     # 如果已經登入，就直接去商品列表
-#     if get_current_user_id():
-#         return redirect(url_for("products"))
-
-#     if request.method == "POST":
-#         user_id = request.form.get("user_id", "").strip()
-#         if not user_id:
-#             flash("請輸入 user id。", "error")
-#             return redirect(url_for("login"))
-
-#         if r.exists(f"user:{user_id}"):
-#             session["user_id"] = user_id
-#             flash("登入成功！", "success")
-#             return redirect(url_for("products"))
-#         else:
-#             flash("找不到這個 user id，請再確認。", "error")
-#             return redirect(url_for("login"))
-
-#     return render_template(
-#         "login.html",
-#         title="登入",
-#         subtitle="輸入你的 user id 重新登入",
-#     )
 
 @app.route("/logout")
 def logout():

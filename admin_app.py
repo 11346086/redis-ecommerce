@@ -11,6 +11,10 @@ app.secret_key = "admin-secret-key-change-this"
 # 共用同一顆雲端 Redis
 r = get_redis_client()
 
+SHIPPING_THRESHOLD = 150   # 滿多少免運
+SHIPPING_FEE = 60          # 未滿門檻運費
+
+
 # ================== 管理員帳密 ==================
 
 ADMIN_USERNAME = "huixu"
@@ -217,32 +221,57 @@ def admin_update_product(pid):
 @app.route("/admin/orders")
 @admin_required
 def admin_orders():
-    """列出所有訂單"""
-    order_keys = r.keys("order:*")
-    orders = []
+    """訂單列表"""
+    order_ids = r.lrange("orders", 0, -1)  # 看你原本怎麼存，通常是這樣
+    # 讓最新的在最上面
+    order_ids = list(reversed(order_ids))
 
-    for key in sorted(order_keys):
-        order_id = key.split(":")[1]
+    orders = []
+    for oid in order_ids:
+        key = f"order:{oid}"
         data = r.hgetall(key)
         if not data:
             continue
 
-        items_map = json.loads(data.get("items", "{}") or "{}")
-        items_count = sum(int(q) for q in items_map.values()) if items_map else 0
+        # 商品金額小計：直接用 checkout 存的 total
+        try:
+            items_total = int(data.get("total", 0))
+        except ValueError:
+            items_total = 0
+
+        # 運費：跟前台一樣規則（滿 150 免運，未滿收 60）
+        # 如果你有在檔案上面定義 SHIPPING_THRESHOLD / SHIPPING_FEE，就用那兩個也可以
+        if items_total == 0:
+            shipping_fee = 0
+        elif items_total >= SHIPPING_THRESHOLD:
+            shipping_fee = 0
+        else:
+            shipping_fee = SHIPPING_FEE
+
+        grand_total = items_total + shipping_fee
+
+        # 商品數量
+        items_json = data.get("items", "{}")
+        try:
+            items_map = json.loads(items_json or "{}")
+        except json.JSONDecodeError:
+            items_map = {}
+        items_count = sum(
+            int(q) for q in items_map.values() if str(q).isdigit()
+        )
 
         orders.append(
             {
-                "id": order_id,
-                "user_id": data.get("user_id", ""),
-                "total": int(data.get("total", 0)),
-                "status": data.get("status", ""),
+                "id": oid,
                 "created_at": data.get("created_at", ""),
+                "user_id": data.get("user_id", ""),
+                "status": data.get("status", "created"),
                 "items_count": items_count,
+                "items_total": items_total,
+                "shipping_fee": shipping_fee,
+                "grand_total": grand_total,  # ✅ 含運費的金額
             }
         )
-
-    # 讓最新的排在最上面
-    orders.sort(key=lambda o: o["id"], reverse=True)
 
     return render_template(
         "admin_orders.html",
@@ -255,31 +284,56 @@ def admin_orders():
 @app.route("/admin/orders/<order_id>")
 @admin_required
 def admin_order_detail(order_id):
-    """單筆訂單明細"""
+    """單筆訂單明細（含運費計算）"""
     key = f"order:{order_id}"
     data = r.hgetall(key)
     if not data:
         flash(f"找不到訂單 {order_id}", "error")
         return redirect(url_for("admin_orders"))
 
-    items_map = json.loads(data.get("items", "{}") or "{}")
+    # 解析 items（pid -> qty）
+    try:
+        items_map = json.loads(data.get("items", "{}") or "{}")
+    except json.JSONDecodeError:
+        items_map = {}
 
     items = []
+    items_total = 0
     for pid, qty_str in items_map.items():
-        info = r.hgetall(f"product:{pid}")
-        price = int(info.get("price", 0))
-        qty = int(qty_str)
+        info = r.hgetall(f"product:{pid}") or {}
+
+        try:
+            price = int(info.get("price", 0) or 0)
+        except ValueError:
+            price = 0
+
+        try:
+            qty = int(qty_str)
+        except ValueError:
+            qty = 0
+
+        subtotal = price * qty
+        items_total += subtotal
+
         items.append(
             {
                 "id": pid,
                 "name": info.get("name", pid),
                 "price": price,
                 "qty": qty,
-                "subtotal": price * qty,
+                "subtotal": subtotal,
             }
         )
 
-    total = int(data.get("total", 0))
+    # 運費：跟前台一樣的規則
+    if items_total == 0:
+        shipping_fee = 0
+    elif items_total >= SHIPPING_THRESHOLD:
+        shipping_fee = 0
+    else:
+        shipping_fee = SHIPPING_FEE
+
+    grand_total = items_total + shipping_fee
 
     return render_template(
         "admin_order_detail.html",
@@ -288,7 +342,9 @@ def admin_order_detail(order_id):
         order_id=order_id,
         order=data,
         items=items,
-        total=total,
+        items_total=items_total,
+        shipping_fee=shipping_fee,
+        grand_total=grand_total,
     )
 
 

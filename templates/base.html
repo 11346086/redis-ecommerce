@@ -273,11 +273,11 @@
         display: inline-flex;
         align-items: center;
         border-radius: 999px;
-        border: 1px solid #bfdbfe;
+        border: 1px solid #f4c9cb;
         font-size: 11px;
         padding: 2px 8px;
-        color: #1d4ed8;
-        background: #eff6ff;
+        color: #db2777;
+        background: #fff1f2;
       }
 
       .info-hint-row {
@@ -355,8 +355,8 @@
         position: relative;
         background: #ffffff;
         border-radius: 16px;
-        border: 1px solid rgba(148, 163, 184, 0.35);
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(248, 113, 113, 0.4); 
+        box-shadow: 0 10px 25px rgba(248, 113, 113, 0.12);
         overflow: hidden;
         transition: box-shadow 0.2s ease, transform 0.2s ease;
         min-height: 180px;
@@ -364,8 +364,8 @@
 
       .product-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
-        border-color: rgba(37, 99, 235, 0.45);
+        box-shadow: 0 14px 30px rgba(138, 2, 2, 0.12);
+        border-color: rgba(228, 62, 62, 0.45); ;
       }
 
       .product-main {
@@ -634,7 +634,7 @@
   <body>
     <header class="navbar">
       <div class="navbar-inner">
-        <div class="brand">甜蜜魔法零食小舖</div>
+        <div class="brand">🍬甜蜜魔法零食小舖🛒</div>
         <div class="nav-links">
           <a
             href="{{ url_for('products') }}"
@@ -655,12 +655,6 @@
             href="{{ url_for('profile') }}"
             class="{% if request.endpoint in ['profile', 'profile_setup', 'profile_edit', 'order_detail'] %}active{% endif %}"
             >個人檔案</a
-          >
-
-          <a 
-            href="{{ url_for('login') }}"
-            class="{% if request.endpoint == 'login' %}active{% endif %}"
-            >登入</a
           >
           <a 
             href="{{ url_for('logout') }}"

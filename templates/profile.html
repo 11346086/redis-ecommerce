@@ -101,7 +101,7 @@
               <tr>
                 <td style="padding:6px 4px;">#{{ o.id }}</td>
                 <td style="padding:6px 4px;">{{ o.created_at }}</td>
-                <td style="padding:6px 4px; text-align:right;">${{ o.total }}</td>
+                <td style="padding:6px 4px; text-align:right;">${{ o.grand_total }}</td>
                 <td style="padding:6px 4px; text-align:center;">{{ o.items_count }}</td>
                 <td style="padding:6px 4px; text-align:center;">
                   <span class="tag">
@@ -180,10 +180,10 @@
         前往商品列表
       </a>
 
-      <!-- 前往秒殺活動 -->
+      <!-- 前往搶購活動 -->
       <a
         href="{{ url_for('seckill') }}"
-        class="btn btn-ghost btn-sm"
+        class="btn btn-primary btn-sm"
         style="text-decoration:none;"
       >
         前往搶購活動

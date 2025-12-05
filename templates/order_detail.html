@@ -3,6 +3,7 @@
 {% block content %}
   <div style="display:flex; flex-direction:column; gap:12px;">
 
+    <!-- 上方：訂單基本資訊 -->
     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
       <div>
         <div class="text-muted" style="font-size:13px;">訂單編號</div>
@@ -12,10 +13,11 @@
       </div>
       <div class="text-muted" style="font-size:13px; text-align:right;">
         建立時間：{{ order.created_at or "—" }}<br />
-        狀態：<span class="tag">{{ order.status or "created" }}</span>
+        狀態：<span class="tag">{{ order.status or "已建立" }}</span>
       </div>
     </div>
 
+    <!-- 商品列表 -->
     <table style="width:100%; border-collapse:collapse; font-size:14px; margin-top:4px;">
       <thead>
         <tr>
@@ -39,14 +41,33 @@
       </tbody>
     </table>
 
-    <div style="text-align:right; margin-top:8px; font-size:15px; font-weight:600;">
-      總金額：${{ recorded_total }}
+    <!-- 金額區：商品小計 + 運費 + 應付金額 -->
+    <div style="text-align:right; margin-top:8px; font-size:14px;">
+      <div style="margin-bottom:4px;">
+        <span>商品金額小計：</span>
+        <span>${{ items_total }}</span>
+      </div>
+      <div style="margin-bottom:4px;">
+        <span>運費：</span>
+        <span>
+          {% if shipping_fee == 0 %}
+            免運
+          {% else %}
+            ${{ shipping_fee }}
+          {% endif %}
+        </span>
+      </div>
+      <div style="font-size:15px; font-weight:600;">
+        <span>應付金額：</span>
+        <span>${{ grand_total }}</span>
+      </div>
     </div>
 
+    <!-- 底部操作按鈕 -->
     <div style="display:flex; gap:8px; margin-top:8px;">
       <a
         href="{{ url_for('profile') }}"
-        class="btn btn-ghost btn-sm"
+        class="btn btn-primary btn-sm"
         style="text-decoration:none;"
       >
         回到個人檔案
