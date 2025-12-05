@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <!-- 商品詳細資訊說明：只出現在商品列表這一頁 -->
+  <div class="info-hint-row">
+    <span class="info-hint-icon">?</span>
+    <span>商品詳細資訊請點選商品卡片右上角的「?」按鈕。</span>
+  </div>
+
+  {% for category, items in products_by_category.items() %}
+    <section style="margin-bottom: 20px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+        <h2 style="margin:0; font-size:18px;">{{ category }}</h2>
+        <span class="tag">分類 · {{ items|length }} 項商品</span>
+      </div>
+
+      <div class="product-grid">
+        {% for p in items %}
+          {# 👇 庫存 0 的商品加上 sold-out class #}
+          <div class="product-card {% if p.stock == 0 %}sold-out{% endif %}">
+
+            {# 👇 庫存 0 時，整張卡片正中央顯示「缺貨」貼紙 #}
+            {% if p.stock == 0 %}
+              <div class="sold-out-badge">缺貨</div>
+            {% endif %}
+
+            {# 右上角小資訊按鈕 #}
+            <button
+              type="button"
+              class="product-info-btn product-info-toggle"
+              title="查看商品詳細資訊"
+            >
+              ?
+            </button>
+
+            {# 上半部：圖片 + 名稱 + 價格 + 加入購物車 #}
+            <div class="product-main">
+              <div class="product-thumb">
+                <img
+                  src="{{ url_for('static', filename='images/products/' ~ p.id ~ '.jpg') }}"
+                  alt="{{ p.name }}"
+                  onerror="this.src='{{ url_for('static', filename='images/products/placeholder.jpg') }}';"
+                >
+              </div>
+
+              <div class="product-body">
+                <div class="product-title">{{ p.name }}</div>
+
+                <div class="product-meta-row">
+                  <span class="product-meta">編號：{{ p.id }}</span>
+                  <span class="product-meta">
+                    {% if p.stock == 0 %}
+                      已售完
+                    {% else %}
+                      庫存：{{ p.stock }}
+                    {% endif %}
+                  </span>
+                </div>
+
+                <div class="product-bottom">
+                  <div class="product-price">
+                    ${{ p.price }} <span>/ 單件</span>
+                  </div>
+
+                  <form
+                    action="{{ url_for('add_to_cart') }}"
+                    method="post"
+                    class="product-actions"
+                  >
+                    <input type="hidden" name="product_id" value="{{ p.id }}">
+                    <input
+                      type="number"
+                      name="qty"
+                      min="1"
+                      max="{{ p.stock }}"
+                      value="1"
+                      {% if p.stock == 0 %}disabled{% endif %}
+                    >
+                    <button
+                      type="submit"
+                      class="btn btn-primary btn-sm"
+                      {% if p.stock == 0 %}disabled{% endif %}
+                    >
+                      加入購物車
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            {# 下半部詳細資訊（按右上角 ? 才會展開） #}
+            <div class="product-extra">
+              <div class="product-extra-row">
+                <span>淨重：</span><span>{{ p.net_weight }}</span>
+              </div>
+              <div class="product-extra-row">
+                <span>製造日期：</span><span>{{ p.mfg }}</span>
+              </div>
+              <div class="product-extra-row">
+                <span>有效日期：</span><span>{{ p.exp }}</span>
+              </div>
+              <div class="product-extra-row">
+                <span>原產地：</span><span>{{ p.origin }}</span>
+              </div>
+              <div class="product-extra-note">
+                提醒：實際資訊以商品包裝標示為主。
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+{% endblock %}

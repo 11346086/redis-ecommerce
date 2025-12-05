@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{"甜蜜魔法零食小舖" }}</title>
+    <style>
+      :root {
+        --primary: #ffb6c1;
+        --primary-soft: #ffe4ec;
+        --accent: #a879d0;
+        --bg: #fcf8f3;
+        --card-bg: #ffffff;
+        /* --text-main: #111827;
+        --text-sub: #6b7280;
+        --border: #e5e7eb; */
+        --text-main: #3b4256;
+        --text-sub: #8d8fa3;
+        --border: #f1e4da;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      /* body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text-main);
+      } */
+
+      body {
+        font-family: "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system,
+          BlinkMacSystemFont, "Segoe UI", sans-serif;
+        margin: 0;
+        background: linear-gradient(135deg, #fcf8f3, #ffeef5);
+        color: var(--text-main);
+      }
+
+      .layout {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 16px 40px;
+      }
+
+      /* 頂部導覽列 */
+      .navbar {
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+      }
+
+      .navbar-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        font-weight: 700;
+        font-size: 20px;
+        color: var(--primary);
+        letter-spacing: 0.03em;
+      }
+
+      .nav-links a {
+        margin-left: 16px;
+        text-decoration: none;
+        color: var(--text-sub);
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
+
+      .nav-links a:hover {
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+
+      .nav-links a.active {
+        background: var(--primary);
+        color: #ffffff;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin: 8px 0 16px;
+      }
+
+      .page-header {
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .page-header-sub {
+        font-size: 14px;
+        color: var(--text-sub);
+      }
+
+      /* flash 訊息 */
+      .flash-wrapper {
+        margin-bottom: 12px;
+      }
+
+      .flash {
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+
+      .flash-success {
+        background: #ecfdf5;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+      }
+
+      .flash-error {
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+      }
+
+      /* 一般卡片容器（內頁主框） */
+      .card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 16px 18px 18px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      /* 表格樣式（如果有用到 table） */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 6px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--border);
+        padding: 8px 6px;
+        text-align: left;
+        font-size: 14px;
+      }
+
+      th {
+        font-weight: 600;
+        color: var(--text-sub);
+        background: #f9fafb;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* 按鈕與輸入框 */
+      .btn {
+        border: none;
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: #ffffff;
+        white-space: nowrap;      /* ✨ 不允許文字換行 */
+        display: inline-flex;     
+        align-items: center;
+        justify-content: center;
+        padding: 6px 16px;        /* 稍微多一點寬度，避免被擠 */
+        border-radius: 999px;
+        border: none;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 12px; /* 稍微方一點的糖果角 */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.15s ease, transform 0.1s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .input-field {
+        border-radius: 8px;
+        border: 1px solid #e1d5cf;
+        padding: 10px 12px;
+        font-size: 14px;
+        background-color: #fffdf9;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease,
+          background-color 0.15s ease;
+      }
+
+      .input-field:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 6px rgba(255, 182, 193, 0.55);
+        outline: none;
+        background-color: #ffffff;
+      }
+
+
+      .btn-primary:hover {
+        background-color: #ff99aa;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.12);
+      }
+
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-sub);
+      }
+
+      .btn-ghost:hover {
+        background: #e5e7eb;
+      }
+
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 13px;
+      }
+
+      input[type="number"] {
+        width: 64px;
+        padding: 4px 6px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        font-size: 13px;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4);
+      }
+
+      .text-muted {
+        color: var(--text-sub);
+        font-size: 13px;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        border: 1px solid #bfdbfe;
+        font-size: 11px;
+        padding: 2px 8px;
+        color: #1d4ed8;
+        background: #eff6ff;
+      }
+
+      .info-hint-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: var(--text-sub);
+      }
+
+      .info-hint-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: var(--primary);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .pill {
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        background: #fee2e2;
+        color: #b91c1c;
+        display: inline-block;
+      }
+
+      @media (max-width: 640px) {
+        .navbar-inner {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        table {
+          font-size: 13px;
+        }
+        th,
+        td {
+          padding: 6px 4px;
+        }
+      }
+
+      /* 如果用 table 顯示商品，可以用這些欄寬（目前商品列表沒用也沒關係） */
+      .product-table col.col-id    { width: 12%; }
+      .product-table col.col-name  { width: 40%; }
+      .product-table col.col-price { width: 12%; }
+      .product-table col.col-stock { width: 12%; }
+      .product-table col.col-action{ width: 24%; }
+
+      /* ================= 商品卡片：一列兩個，左圖右文字 ================= */
+
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      @media (max-width: 900px) {
+        .product-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .product-card {
+        position: relative;
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        min-height: 180px;
+      }
+
+      .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+        border-color: rgba(37, 99, 235, 0.45);
+      }
+
+      .product-main {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        padding: 18px 22px;
+      }
+
+      /* 右上角的小資訊按鈕 */
+      .product-info-btn {
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        border: none;
+        background: #ffe4e7;
+        color: #f9739a;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .product-info-btn:hover {
+        background: #ffd4d9;
+      }
+
+      /* 展開詳細資訊時，讓按鈕顏色反轉一下 */
+      .product-card.show-extra .product-info-btn {
+        background: #f9739a;
+        color: #ffffff;
+      }
+
+      /* 下方詳細資訊區塊，預設隱藏 */
+      .product-extra {
+        display: none;
+        padding: 8px 18px 12px;
+        border-top: 1px solid #e5e7eb;
+        font-size: 13px;
+        color: #4b5563;
+      }
+
+      /* 卡片被加上 .show-extra 時，就顯示詳細資訊 */
+      .product-card.show-extra .product-extra {
+        display: block;
+      }
+
+      .product-extra-row {
+        display: flex;
+        gap: 4px;
+        margin: 2px 0;
+      }
+
+      .product-extra-note {
+        margin-top: 4px;
+        color: #6b7280;
+        font-size: 12px;
+      }
+
+      .product-thumb {
+        width: 140px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #f9fafb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .product-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .product-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .product-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 1px;
+      }
+
+      .product-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 18px;               /* 編號與庫存的間距 */
+        margin-top: 1px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      .product-bottom {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;   /* 改成上下排列 */
+        align-items: flex-start;  /* 靠左對齊 */
+        gap: 15px;                 /* 上下間距 */
+      }
+
+
+      .product-price {
+        font-weight: 700;
+        font-size: 16px;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: baseline;
+      }
+
+      .product-price span {
+        font-size: 12px;
+        color: #6b7280;
+        margin-left: 2px;
+      }
+
+
+      /* 數量 + 按鈕 */
+      .product-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .product-actions input[type="number"] {
+        width: 64px;
+      }
+
+      .product-bottom input[type="number"] {
+        width: 70px;
+      }
+
+      /* ================= 購物車版面 ================= */
+
+      .cart-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+        gap: 16px;
+      }
+
+      .cart-summary-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 14px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+        position: sticky;
+        top: 80px;
+        align-self: flex-start;
+      }
+
+      @media (max-width: 768px) {
+        .cart-layout {
+          grid-template-columns: 1fr;
+        }
+        .cart-summary-card {
+          position: static;
+        }
+      }
+
+      /* ================= 搶購活動 ================= */
+
+      .seckill-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .seckill-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 14px 16px;
+        border: 1px solid rgba(248, 113, 113, 0.4);
+        box-shadow: 0 10px 25px rgba(248, 113, 113, 0.12);
+      }
+
+      .badge-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        font-size: 11px;
+        border-radius: 999px;
+        font-weight: 500;
+      }
+      .badge-open {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .badge-notyet {
+        background: #fef9c3;
+        color: #854d0e;
+      }
+      .badge-end {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .seckill-progress {
+        margin-top: 6px;
+        margin-bottom: 2px;
+      }
+
+      .seckill-progress-bar {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        overflow: hidden;
+        margin-bottom: 4px;
+      }
+
+      .seckill-progress-inner {
+        height: 100%;
+        background: linear-gradient(to right, #fb923c, #f97316);
+      }
+
+      /* ===== 庫存為 0 時的「缺貨」效果 ===== */
+
+      /* 整張卡片變灰＋透明一點 */
+      .product-card.sold-out {
+        filter: grayscale(100%);
+        opacity: 0.6;
+      }
+
+      /* 確保可以放貼紙在圖片上 */
+      .product-thumb {
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* 粉紅色「缺貨」貼紙 */
+      .sold-out-badge {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 130, 170, 0.95); 
+        color: #fff;
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        box-shadow: 0 6px 16px rgba(255, 105, 180, 0.4);
+        z-index: 5; 
+      }
+
+      /* 被 disabled 的按鈕樣式（看起來淡一點） */
+      .product-card.sold-out .btn.btn-primary[disabled] {
+        background: #f7a5c6;
+        cursor: not-allowed;
+        box-shadow: none;
+        position: relative;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="navbar-inner">
+        <div class="brand">甜蜜魔法零食小舖</div>
+        <div class="nav-links">
+          <a
+            href="{{ url_for('products') }}"
+            class="{% if request.endpoint == 'products' %}active{% endif %}"
+            >商品列表</a
+          >
+          <a
+            href="{{ url_for('cart') }}"
+            class="{% if request.endpoint == 'cart' %}active{% endif %}"
+            >購物車</a
+          >
+          <a
+            href="{{ url_for('seckill') }}"
+            class="{% if request.endpoint == 'seckill' %}active{% endif %}"
+            >搶購活動</a
+          >
+          <a 
+            href="{{ url_for('profile') }}"
+            class="{% if request.endpoint in ['profile', 'profile_setup', 'profile_edit', 'order_detail'] %}active{% endif %}"
+            >個人檔案</a
+          >
+
+          <a 
+            href="{{ url_for('login') }}"
+            class="{% if request.endpoint == 'login' %}active{% endif %}"
+            >登入</a
+          >
+          <a 
+            href="{{ url_for('logout') }}"
+            >登出</a
+          >
+
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+    {% if request.endpoint != 'profile_setup' %}
+      <div class="page-header">
+        <div>
+          <h1>{{ title or "Redis Shop" }}</h1>
+          {% if subtitle %}
+          <div class="page-header-sub">{{ subtitle }}</div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+      <div class="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="card">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".product-info-toggle").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const card = btn.closest(".product-card");
+            if (!card) return;
+            card.classList.toggle("show-extra");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

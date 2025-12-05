@@ -1,0 +1,91 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div style="max-width:520px; margin:0 auto;">
+
+    <div class="login-hero" style="margin-bottom:20px;">
+      <h1>編輯搶購活動</h1>
+      <p>調整活動商品時間、名額與價格。</p>
+    </div>
+
+    <form method="post" style="display:flex; flex-direction:column; gap:10px;">
+      <div>
+        <label>限量商品編號</label>
+        <input
+          class="input-field"
+          style="width:100%;"
+          value="{{ product_id }}"
+          disabled
+        >
+      </div>
+
+      <div>
+        <label>限量商品名稱</label>
+        <input
+          type="text"
+          name="product_name"
+          class="input-field"
+          style="width:100%;"
+          value="{{ product.get('name', '') }}"
+        >
+      </div>
+
+      <div>
+        <label>售價（原價）</label>
+        <input
+          type="number"
+          name="price"
+          min="0"
+          class="input-field"
+          style="width:100%;"
+          value="{{ price }}"
+        >
+      </div>
+
+      <div style="display:flex; gap:8px;">
+        <div style="flex:1;">
+          <label>開始時間</label>
+          <input
+            name="start"
+            class="input-field"
+            style="width:100%;"
+            value="{{ config.get('start', '') }}"
+          >
+        </div>
+        <div style="flex:1;">
+          <label>結束時間</label>
+          <input
+            name="end"
+            class="input-field"
+            style="width:100%;"
+            value="{{ config.get('end', '') }}"
+          >
+        </div>
+      </div>
+
+      <div>
+        <label>活動名額</label>
+        <input
+          type="number"
+          name="quota"
+          min="1"
+          class="input-field"
+          style="width:100%;"
+          value="{{ config.get('quota', '') }}"
+        >
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:8px;">
+        儲存變更
+      </button>
+
+      <a
+        href="{{ url_for('admin_seckill') }}"
+        class="btn btn-secondary"
+        style="margin-top:4px; display:inline-block;"
+      >
+        返回搶購管理
+      </a>
+    </form>
+  </div>
+{% endblock %}

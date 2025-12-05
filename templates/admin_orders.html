@@ -1,0 +1,56 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div style="margin-bottom:8px; font-size:14px; color:#6b7280;">
+    這裡會列出前台建立的所有訂單。
+  </div>
+
+  {% if orders %}
+    <table>
+      <thead>
+        <tr>
+          <th>訂單編號</th>
+          <th>建立時間</th>
+          <th>使用者</th>
+          <th class="text-right">金額</th>
+          <th class="text-center">商品數量</th>
+          <th class="text-center">狀態</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+          <tr>
+            <td>#{{ o.id }}</td>
+            <td>{{ o.created_at }}</td>
+            <td>{{ o.user_id }}</td>
+            <td class="text-right">${{ o.total }}</td>
+            <td class="text-center">{{ o.items_count }}</td>
+            <td class="text-center">{{ o.status }}</td>
+            <td class="text-center">
+              <a
+                href="{{ url_for('admin_order_detail', order_id=o.id) }}"
+                class="btn btn-sm btn-ghost"
+              >
+                查看
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="display:flex; gap:8px; margin-top:4px;">
+    <a href="{{ url_for('admin_dashboard') }}" 
+      class="btn btn-primary btn-sm" 
+      style="text-decoration:none;">
+    回管理首頁
+    </a>
+    </div>
+    
+  {% else %}
+    <div class="text-muted" style="font-size:14px;">
+      目前還沒有任何訂單。
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:12px;">
+    <div>
+      <div style="font-size:15px; font-weight:600;">訂單編號：#{{ order_id }}</div>
+      <div class="text-muted" style="margin-top:4px; font-size:13px;">
+        建立時間：{{ order.created_at or "—" }}<br>
+        使用者：{{ order.user_id or "—" }}
+      </div>
+    </div>
+
+    <form
+      action="{{ url_for('admin_update_order_status', order_id=order_id) }}"
+      method="post"
+      style="display:flex; align-items:center; gap:6px;"
+    >
+      <label class="text-muted" style="font-size:13px;">訂單狀態</label>
+      <select
+        name="status"
+        style="border-radius:999px; padding:4px 8px; border:1px solid #fecaca; font-size:13px;"
+      >
+        {% for s in ["已接單", "已撿貨", "已出貨"] %}
+          <option value="{{ s }}" {% if order.status == s %}selected{% endif %}>
+            {{ s }}
+          </option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary btn-sm">儲存</button>
+    </form>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>商品編號</th>
+        <th>名稱</th>
+        <th class="text-right">單價</th>
+        <th class="text-center">數量</th>
+        <th class="text-right">小計</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td class="text-right">${{ item.price }}</td>
+          <td class="text-center">{{ item.qty }}</td>
+          <td class="text-right">${{ item.subtotal }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" class="text-right" style="font-weight:600;">訂單金額</td>
+        <td class="text-right" style="font-weight:600;">${{ total }}</td>
+      </tr>
+    </tfoot>
+  </table>
+{% endblock %}

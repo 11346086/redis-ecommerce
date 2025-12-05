@@ -1,0 +1,44 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div style="max-width:400px; margin:0 auto;">
+
+    <!-- 標題區 -->
+    <div style="text-align: center; margin-bottom: 4px;">
+      <div style="font-size: 26px; font-weight: 700; letter-spacing: 0.08em;">
+        管理後台登入
+      </div>
+      <div style="font-size: 16px; color: var(--text-sub); margin-top: 6px;">
+        請輸入管理員帳號與密碼。
+      </div>
+    </div>
+
+    <form action="{{ url_for('admin_login') }}" method="post" style="display:flex; flex-direction:column; gap:10px;">
+      <div>
+        <label style="font-size:16px;">帳號</label>
+        <input
+          type="text"
+          name="username"
+          class="input-field"
+          style="width:100%;"
+          placeholder="例如：admin"
+        >
+      </div>
+
+      <div>
+        <label style="font-size:16px;">密碼</label>
+        <input
+          type="password"
+          name="password"
+          class="input-field"
+          style="width:100%;"
+          placeholder="請輸入密碼"
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:6px;">
+        登入管理後台
+      </button>
+    </form>
+  </div>
+{% endblock %}

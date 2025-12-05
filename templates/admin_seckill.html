@@ -1,0 +1,159 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div class="text-muted" style="font-size:14px; margin-bottom:10px;">
+    查看各商品搶購的名額、剩餘名額與成功名單，並可直接在此編輯活動設定。
+  </div>
+
+  {% if events %}
+    {% for e in events %}
+      <div class="card" style="margin-bottom:12px;">
+        <div style="font-size:15px; font-weight:600; margin-bottom:4px;">
+          {{ e.product_name }}（編號 {{ e.product_id }}）
+        </div>
+
+        <div class="text-muted" style="font-size:13px; margin-bottom:6px;">
+          活動時間：{{ e.start_time }} ～ {{ e.end_time }}，售價：${{ e.price }}
+        </div>
+
+        <div style="font-size:13px; margin-bottom:6px;">
+          名額：{{ e.total_quota }}，已成功：{{ e.success_count }} 人，
+          剩餘名額：{{ e.stock }}
+        </div>
+
+        {# === 成功名單：可收合 === #}
+        {% if e.records and e.records|length > 0 %}
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm seckill-toggle"
+            data-target="records-{{ e.product_id }}"
+            style="margin-top:6px;"
+          >
+            查看成功名單
+          </button>
+
+          <div
+            id="records-{{ e.product_id }}"
+            class="seckill-records"
+            style="display:none; margin-top:6px; font-size:13px;"
+          >
+            <div class="text-muted" style="margin-bottom:2px;">
+              成功名單（依搶購時間排序）：
+            </div>
+            <ul style="list-style:none; padding-left:0; margin:0;">
+              {% for rec in e.records %}
+                <li style="margin:2px 0;">
+                  <span class="tag" style="margin-right:4px; margin-top:2px;">
+                    {{ rec.user_name }}
+                  </span>
+                  <span class="text-muted" style="font-size:12px;">
+                    {{ rec.user_id }} ・ {{ rec.time }}
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% else %}
+          <div class="text-muted" style="font-size:13px; margin-top:4px;">
+            目前尚無搶購成功紀錄。
+          </div>
+        {% endif %}
+
+        {# === 編輯搶購活動設定 === #}
+        <hr style="margin:10px 0; border:none; border-top:1px dashed #fbcfe8;">
+
+        <form
+          action="{{ url_for('admin_update_seckill', pid=e.product_id) }}"
+          method="post"
+          class="seckill-edit-form"
+          style="font-size:13px; display:flex; flex-direction:column; gap:8px;"
+        >
+          <div style="display:flex; gap:8px;">
+            <div style="flex:1;">
+              <label>售價</label>
+              <input
+                type="number"
+                name="price"
+                min="0"
+                value="{{ e.price }}"
+                class="input-field"
+                style="width:100%;"
+              >
+            </div>
+            <div style="flex:1;">
+              <label>活動名額（總名額）</label>
+              <input
+                type="number"
+                name="quota"
+                min="1"
+                value="{{ e.total_quota }}"
+                class="input-field"
+                style="width:100%;"
+              >
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px;">
+            <div style="flex:1;">
+              <label>開始時間</label>
+              <input
+                type="text"
+                name="start"
+                value="{{ e.start_time }}"
+                placeholder="例如 10:00"
+                class="input-field"
+                style="width:100%;"
+              >
+            </div>
+            <div style="flex:1;">
+              <label>結束時間</label>
+              <input
+                type="text"
+                name="end"
+                value="{{ e.end_time }}"
+                placeholder="例如 11:00"
+                class="input-field"
+                style="width:100%;"
+              >
+            </div>
+          </div>
+
+          <div style="text-align:right; margin-top:2px;">
+            <button type="submit" class="btn btn-primary btn-sm">
+              儲存活動設定
+            </button>
+          </div>
+        </form>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="text-muted" style="font-size:14px;">
+      尚未設定任何搶購活動。
+    </div>
+  {% endif %}
+
+  <div style="display:flex; gap:8px; margin-top:4px;">
+    <a href="{{ url_for('admin_new_seckill') }}"
+       class="btn btn-primary btn-sm"
+       style="text-decoration:none; margin-top:4px;">
+      ＋ 新增限量商品搶購
+    </a>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".seckill-toggle").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const targetId = btn.dataset.target;
+          const panel = document.getElementById(targetId);
+          if (!panel) return;
+
+          const isHidden =
+            panel.style.display === "" || panel.style.display === "none";
+          panel.style.display = isHidden ? "block" : "none";
+          btn.textContent = isHidden ? "隱藏成功名單" : "查看成功名單";
+        });
+      });
+    });
+  </script>
+{% endblock %}

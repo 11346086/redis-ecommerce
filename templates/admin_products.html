@@ -1,0 +1,66 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div style="display:flex; flex-direction:column; gap:12px;">
+
+    <div style="font-size:15px; font-weight:600;">商品列表</div>
+    
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+      <thead>
+        <tr>
+          <th style="padding:6px 4px; border-bottom:1px solid var(--border);">編號</th>
+          <th style="padding:6px 4px; border-bottom:1px solid var(--border);">名稱</th>
+          <th style="padding:6px 4px; border-bottom:1px solid var(--border);">分類</th>
+          <th style="padding:6px 4px; border-bottom:1px solid var(--border);">價格</th>
+          <th style="padding:6px 4px; border-bottom:1px solid var(--border);">庫存</th>
+          <th style="padding:6px 4px; border-bottom:1px solid var(--border); text-align:center;">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+          <tr>
+            <td style="padding:6px 4px;">{{ p.id }}</td>
+            <td style="padding:6px 4px;">{{ p.name }}</td>
+            <td style="padding:6px 4px;">{{ p.category }}</td>
+            <td style="padding:6px 4px;">
+              <form action="{{ url_for('admin_update_product', pid=p.id) }}" method="post" style="display:flex; align-items:center; gap:6px;">
+                <input
+                  type="number"
+                  name="price"
+                  min="0"
+                  value="{{ p.price }}"
+                  style="width:80px; padding:4px 6px; border-radius:8px; border:1px solid var(--border);"
+                >
+            </td>
+            <td style="padding:6px 4px;">
+                <input
+                  type="number"
+                  name="stock"
+                  min="0"
+                  value="{{ p.stock }}"
+                  style="width:80px; padding:4px 6px; border-radius:8px; border:1px solid var(--border);"
+                >
+            </td>
+            <td style="padding:6px 4px; text-align:center;">
+                <button type="submit" class="btn btn-primary btn-sm">儲存</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <div style="display:flex; gap:8px; margin-top:4px;">
+    <a href="{{ url_for('admin_new_product') }}"
+     class="btn btn-primary btn-sm"
+     style="text-decoration:none;">
+    ＋ 新增商品
+    </a>
+    <a href="{{ url_for('admin_dashboard') }}" 
+      class="btn btn-primary btn-sm" 
+      style="text-decoration:none;">
+    回管理首頁
+    </a>
+    </div>
+  </div>
+{% endblock %}

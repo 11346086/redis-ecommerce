@@ -1,0 +1,36 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div style="font-size:15px;">
+      嗨，管理員 👋  
+      <span class="text-muted" style="margin-left:4px;">這裡是系統概況。</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px;">
+      <div class="card" style="padding:12px 14px;">
+        <div class="text-muted" style="font-size:13px;">商品總數量</div>
+        <div style="font-size:22px; font-weight:700; margin-top:4px;">{{ product_count }}</div>
+      </div>
+
+      <div class="card" style="padding:12px 14px;">
+        <div class="text-muted" style="font-size:13px;">訂單總數量</div>
+        <div style="font-size:22px; font-weight:700; margin-top:4px;">{{ order_count }}</div>
+      </div>
+
+      <div class="card" style="padding:12px 14px;">
+        <div class="text-muted" style="font-size:13px;">註冊總用戶數</div>
+        <div style="font-size:22px; font-weight:700; margin-top:4px;">{{ user_count }}</div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:4px;">
+      <a href="{{ url_for('admin_products') }}" class="btn btn-primary btn-sm" style="text-decoration:none;">
+        編輯商品價格/數量
+      </a>
+      <a href="{{ url_for('admin_orders') }}" class="btn btn-primary btn-sm" style="text-decoration:none;">
+        查看各訂單內容
+      </a>
+    </div>
+  </div>
+{% endblock %}

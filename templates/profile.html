@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="display:flex; flex-direction:column; gap:16px; max-width:720px;">
+
+    <!-- 🔔 提醒使用者一定要記下 user id -->
+    <div
+      style="
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        font-size: 14px;
+        line-height: 1.6;
+      "
+    >
+      <strong>⚠ 請務必記下你的 user id：</strong>
+      <div
+        style="
+          margin-top: 4px;
+          font-weight: 700;
+          font-size: 18px;
+          letter-spacing: 0.03em;
+        "
+      >
+        {{ user_id }}
+      </div>
+      <div style="margin-top: 4px; font-size: 13px; color: #991b1b;">
+        建議截圖或寫下來，之後換電腦或重新開瀏覽器，要登入同一個帳號時就需要這組編號。
+      </div>
+    </div>
+
+    <!-- 上半部：基本資料 + 編輯按鈕 -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+      <div>
+        <div class="text-muted" style="font-size:13px;">使用者編號</div>
+        <div style="font-size:15px; font-weight:600; margin-top:2px;">
+          {{ user_id }}
+        </div>
+      </div>
+
+      <a
+        href="{{ url_for('profile_edit') }}"
+        class="btn btn-primary btn-sm"
+        style="text-decoration:none;"
+      >
+        編輯個人資料
+      </a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:120px 1fr; row-gap:6px; column-gap:12px; font-size:14px;">
+      <div class="text-muted">姓名</div>
+      <div>{{ user.name or "（尚未填寫）" }}</div>
+
+      <div class="text-muted">連絡電話</div>
+      <div>{{ user.phone or "（尚未填寫）" }}</div>
+
+      <div class="text-muted">收件地址</div>
+      <div>{{ user.address or "（尚未填寫）" }}</div>
+
+      <div class="text-muted">建立時間</div>
+      <div>{{ user.created_at or "—" }}</div>
+
+      {% if user.updated_at %}
+        <div class="text-muted">最後更新</div>
+        <div>{{ user.updated_at }}</div>
+      {% endif %}
+    </div>
+
+    <!-- 分隔線 -->
+    <hr style="border:none; border-top:1px solid var(--border); margin:8px 0;" />
+
+    <!-- 下半部：歷史訂單列表 -->
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div style="font-size:16px; font-weight:600;">歷史訂單</div>
+        <div class="text-muted" style="font-size:13px;">
+          {% if orders and orders|length > 0 %}
+            共 {{ orders|length }} 筆
+          {% else %}
+            目前尚無訂單
+          {% endif %}
+        </div>
+      </div>
+
+      {% if orders and orders|length > 0 %}
+        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:6px 4px; border-bottom:1px solid var(--border);">訂單編號</th>
+              <th style="text-align:left; padding:6px 4px; border-bottom:1px solid var(--border);">時間</th>
+              <th style="text-align:right; padding:6px 4px; border-bottom:1px solid var(--border);">金額</th>
+              <th style="text-align:center; padding:6px 4px; border-bottom:1px solid var(--border);">商品數量</th>
+              <th style="text-align:center; padding:6px 4px; border-bottom:1px solid var(--border);">狀態</th>
+              <th style="text-align:center; padding:6px 4px; border-bottom:1px solid var(--border);"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+              <tr>
+                <td style="padding:6px 4px;">#{{ o.id }}</td>
+                <td style="padding:6px 4px;">{{ o.created_at }}</td>
+                <td style="padding:6px 4px; text-align:right;">${{ o.total }}</td>
+                <td style="padding:6px 4px; text-align:center;">{{ o.items_count }}</td>
+                <td style="padding:6px 4px; text-align:center;">
+                  <span class="tag">
+                    {{ o.status }}
+                  </span>
+                </td>
+                <td style="padding:6px 4px; text-align:center;">
+                  <a
+                    href="{{ url_for('order_detail', order_id=o.id) }}"
+                    class="btn btn-sm btn-ghost"
+                    style="font-size:12px; text-decoration:none;"
+                  >
+                    查看明細
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="text-muted" style="font-size:14px; margin-top:4px;">
+          還沒有任何訂單紀錄，先去逛逛商品吧！
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 再分隔線一條 -->
+    <hr style="border:none; border-top:1px solid var(--border); margin:8px 0;" />
+
+    <!-- ✅ 搶購活動紀錄 -->
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div style="font-size:16px; font-weight:600;">搶購活動紀錄</div>
+        <div class="text-muted" style="font-size:13px;">
+          {% if seckill_records and seckill_records|length > 0 %}
+            共 {{ seckill_records|length }} 筆
+          {% else %}
+            尚未有搶購成功紀錄
+          {% endif %}
+        </div>
+      </div>
+
+      {% if seckill_records and seckill_records|length > 0 %}
+        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:6px 4px; border-bottom:1px solid var(--border);">商品編號</th>
+              <th style="text-align:left; padding:6px 4px; border-bottom:1px solid var(--border);">商品名稱</th>
+              <th style="text-align:left; padding:6px 4px; border-bottom:1px solid var(--border);">成功時間</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in seckill_records %}
+              <tr>
+                <td style="padding:6px 4px;">{{ s.product_id }}</td>
+                <td style="padding:6px 4px;">{{ s.product_name }}</td>
+                <td style="padding:6px 4px;">{{ s.created_at }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="text-muted" style="font-size:14px; margin-top:4px;">
+          暫時還沒有搶購成功紀錄，可以到「搶購活動」試試手氣！
+        </div>
+      {% endif %}
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:4px;">
+      <!-- 前往商品列表 -->
+      <a
+        href="{{ url_for('products') }}"
+        class="btn btn-primary btn-sm"
+        style="text-decoration:none;"
+      >
+        前往商品列表
+      </a>
+
+      <!-- 前往秒殺活動 -->
+      <a
+        href="{{ url_for('seckill') }}"
+        class="btn btn-ghost btn-sm"
+        style="text-decoration:none;"
+      >
+        前往搶購活動
+      </a>
+    </div>
+  </div>
+{% endblock %}

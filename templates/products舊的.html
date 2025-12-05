@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% for category, items in products_by_category.items() %}
+    <section style="margin-bottom: 20px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+        <h2 style="margin:0; font-size:18px;">{{ category }}</h2>
+        <span class="tag">分類 · {{ items|length }} 項商品</span>
+      </div>
+
+      <div class="product-grid">
+        {% for p in items %}
+          <div class="product-card">
+            {# 右上角小資訊按鈕 #}
+            <button
+              type="button"
+              class="product-info-btn product-info-toggle"
+              title="查看商品詳細資訊"
+            >
+              ?
+            </button>
+
+            {# 上半部：圖片 + 名稱 + 價格 + 加入購物車 #}
+            <div class="product-main">
+              <div class="product-thumb">
+                <img
+                  src="{{ url_for('static', filename='images/products/' ~ p.id ~ '.jpg') }}"
+                  alt="{{ p.name }}"
+                  onerror="this.src='{{ url_for('static', filename='images/products/placeholder.jpg') }}';"
+                >
+              </div>
+
+              <div class="product-body">
+                <div class="product-title">{{ p.name }}</div>
+
+                <div class="product-meta-row">
+                  <span class="product-meta">編號：{{ p.id }}</span>
+                  <span class="product-meta">庫存：{{ p.stock }}</span>
+                </div>
+
+                <div class="product-bottom">
+                  <div class="product-price">
+                    ${{ p.price }} <span>/ 單件</span>
+                  </div>
+
+                  <form
+                    action="{{ url_for('add_to_cart') }}"
+                    method="post"
+                    class="product-actions"
+                  >
+                    <input type="hidden" name="product_id" value="{{ p.id }}">
+                    <input
+                      type="number"
+                      name="qty"
+                      min="1"
+                      max="{{ p.stock }}"
+                      value="1"
+                    >
+                    <button type="submit" class="btn btn-primary btn-sm">
+                      加入購物車
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            {# 下半部詳細資訊（按右上角 i 才會展開） #}
+            <div class="product-extra">
+              <div class="product-extra-row">
+                <span>產地：</span><span>台灣</span>
+              </div>
+              <div class="product-extra-row">
+                <span>製造日期：</span><span>2025-11-01</span>
+              </div>
+              <div class="product-extra-row">
+                <span>有效日期：</span><span>2026-05-01</span>
+              </div>
+              <div class="product-extra-row">
+                <span>包裝：</span><span>袋裝</span>
+              </div>
+              <div class="product-extra-note">
+                提醒：實際資訊以商品包裝標示為主。
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+{% endblock %}

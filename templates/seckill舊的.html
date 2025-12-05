@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if not events %}
+    <p class="text-muted">目前沒有正在進行的秒殺活動。</p>
+  {% else %}
+    <div class="seckill-grid">
+      {% for e in events %}
+        <div class="seckill-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+            <div>
+              <div class="text-muted" style="font-size:13px;">活動商品</div>
+              <div style="font-size:18px; font-weight:600; margin-top:2px;">
+                {{ e.product_name }}（編號 {{ e.product_id }}）
+              </div>
+            </div>
+            <div>
+              {% if e.open_now %}
+                <span class="badge-status badge-open">進行中</span>
+              {% elif e.stock <= 0 %}
+                <span class="badge-status badge-end">已結束</span>
+              {% else %}
+                <span class="badge-status badge-notyet">尚未開始</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="text-muted" style="font-size:13px; margin-bottom:6px;">
+            原價：${{ e.price }}　
+            |　活動時間：{{ e.start_time }} ~ {{ e.end_time }}
+          </div>
+
+          <div class="seckill-progress">
+            {% set taken = e.total_quota - e.stock %}
+            {% set ratio = (taken * 100 // e.total_quota) if e.total_quota > 0 else 0 %}
+            <div class="seckill-progress-bar">
+              <div class="seckill-progress-inner" style="width: {{ ratio }}%;"></div>
+            </div>
+            <div class="text-muted" style="font-size:12px;">
+              {{ taken }}/{{ e.total_quota }} 名額已被搶走，剩餘：{{ e.stock }}
+            </div>
+          </div>
+
+          <form action="{{ url_for('seckill_join') }}" method="post" style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+            <input type="hidden" name="product_id" value="{{ e.product_id }}">
+            <input
+              type="text"
+              name="user_id"
+              placeholder="輸入 user id 參加，例如 u1, melody"
+              style="flex:1; padding:6px 10px; border-radius:999px; border:1px solid var(--border); font-size:13px;"
+              {% if not e.open_now or e.stock <= 0 %}disabled{% endif %}
+            >
+            <button
+              type="submit"
+              class="btn btn-primary btn-sm"
+              {% if not e.open_now or e.stock <= 0 %}disabled{% endif %}
+            >
+              {% if e.stock <= 0 %}
+                名額已滿
+              {% elif not e.open_now %}
+                尚未開始
+              {% else %}
+                參加秒殺
+              {% endif %}
+            </button>
+          </form>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

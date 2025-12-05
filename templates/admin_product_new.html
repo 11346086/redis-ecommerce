@@ -1,0 +1,58 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div style="max-width:520px; margin:0 auto;">
+    
+    <form method="post" style="display:flex; flex-direction:column; gap:10px;">
+      <div>
+        <label>商品編號</label>
+        <input name="id" class="input-field" style="width:100%;" required >
+      </div>
+
+      <div>
+        <label>商品名稱</label>
+        <input name="name" class="input-field" style="width:100%;" required>
+      </div>
+
+      <div>
+        <label>單價</label>
+        <input name="price" type="number" min="0" value="0"
+               class="input-field" style="width:100%;" required>
+      </div>
+
+      <div>
+        <label>分類</label>
+        <input name="category" class="input-field" style="width:100%;">
+      </div>
+
+      <div>
+        <label>初始庫存</label>
+        <input name="stock" type="number" min="0" value="0"
+               class="input-field" style="width:100%;" required>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;">
+        <div>
+          <label>淨重</label>
+          <input name="net_weight" class="input-field" style="width:100%;">
+        </div>
+        <div>
+          <label>產地</label>
+          <input name="origin" class="input-field" style="width:100%;">
+        </div>
+        <div>
+          <label>製造日期</label>
+          <input name="mfg" class="input-field" style="width:100%;">
+        </div>
+        <div>
+          <label>有效日期</label>
+          <input name="exp" class="input-field" style="width:100%;">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:8px;">
+        儲存商品
+      </button>
+    </form>
+  </div>
+{% endblock %}

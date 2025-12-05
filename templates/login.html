@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="max-width:420px; margin:0 auto;">
+    <!-- 上面小標題說明 -->
+    <div class="login-hero" style="text-align:center; margin-bottom:18px;">
+      <h1 style="font-size:22px; margin:0 0 6px;">
+        使用 user id 登入
+      </h1>
+      <p style="font-size:14px; color:#8d8fa3; margin:0;">
+        在「個人檔案」頁面可以看到自己的 user id，<br>
+        換電腦或重新開啟瀏覽器，只要輸入這組 id 就能回到原本帳號。
+      </p>
+    </div>
+
+    <!-- 登入表單 -->
+    <form action="{{ url_for('login') }}" method="post">
+      <label
+        for="user_id"
+        style="font-size:14px; display:block; margin-bottom:4px; color:#4b5563;"
+      >
+        User ID
+      </label>
+
+      <input
+        id="user_id"
+        type="text"
+        name="user_id"
+        placeholder="例如：u_1ab2cd34"
+        class="input-field"
+        style="width:100%; margin-bottom:10px;"
+      >
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        style="width:100%; justify-content:center; margin-top:4px;"
+      >
+        登入
+      </button>
+    </form>
+  </div>
+{% endblock %}

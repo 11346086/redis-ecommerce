@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="display:flex; flex-direction:column; gap:12px;">
+
+    <!-- 顯示目前登入的使用者 -->
+    <div class="text-muted" style="font-size:14px; margin-bottom:4px;">
+      目前登入使用者：
+      <strong>
+        {{ user.name or user_id }}
+      </strong>
+      <span style="font-size:12px; color:#9ca3af;">
+        （ID：{{ user_id }}）
+      </span>
+    </div>
+
+    {% for e in events %}
+      <section class="seckill-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+          <div>
+            <div class="text-muted" style="font-size:13px;">活動商品</div>
+            <div style="font-size:16px; font-weight:600;">
+              {{ e.product_name }}（編號 {{ e.product_id }}）
+            </div>
+            <div class="text-muted" style="font-size:13px; margin-top:2px;">
+              原價：${{ e.price }}　
+              活動時間：{{ e.start_time }} ~ {{ e.end_time }}
+            </div>
+          </div>
+
+          {% if e.open_now %}
+            <span class="badge-status badge-open">進行中</span>
+          {% elif e.stock <= 0 %}
+            <span class="badge-status badge-end">已結束</span>
+          {% else %}
+            <span class="badge-status badge-notyet">尚未開始</span>
+          {% endif %}
+        </div>
+
+        <!-- 進度條 -->
+        <div class="seckill-progress">
+          <div style="font-size:12px; color:#6b7280; margin-bottom:2px;">
+            {{ e.success_count }}/{{ e.total_quota }} 名額已被搶走，剩餘：{{ e.stock }}
+          </div>
+          <div class="seckill-progress-bar">
+            {% set ratio = 0 %}
+            {% if e.total_quota > 0 %}
+              {% set ratio = (e.success_count / e.total_quota * 100) | round(0, 'floor') %}
+            {% endif %}
+            <div class="seckill-progress-inner" style="width: {{ ratio }}%;"></div>
+          </div>
+        </div>
+
+        <!-- 參加搶購的表單：只需要 product_id，使用者自動用 session 的 user_id -->
+        <form
+          action="{{ url_for('seckill_join') }}"
+          method="post"
+          style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;"
+        >
+          <input type="hidden" name="product_id" value="{{ e.product_id }}">
+
+          <div class="text-muted" style="font-size:13px;">
+            將以「{{ user.name or user_id }}」的身分參加本活動。
+          </div>
+
+          {% if e.open_now and e.stock > 0 %}
+            <button type="submit" class="btn btn-primary btn-sm">
+              參加搶購
+            </button>
+          {% else %}
+            <button type="button" class="btn btn-primary btn-sm" disabled>
+              {% if e.stock <= 0 %}
+                名額已滿
+              {% else %}
+                尚未開始
+              {% endif %}
+            </button>
+          {% endif %}
+        </form>
+      </section>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="display:flex; flex-direction:column; gap:12px;">
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div>
+        <div class="text-muted" style="font-size:13px;">訂單編號</div>
+        <div style="font-size:16px; font-weight:600; margin-top:2px;">
+          #{{ order_id }}
+        </div>
+      </div>
+      <div class="text-muted" style="font-size:13px; text-align:right;">
+        建立時間：{{ order.created_at or "—" }}<br />
+        狀態：<span class="tag">{{ order.status or "created" }}</span>
+      </div>
+    </div>
+
+    <table style="width:100%; border-collapse:collapse; font-size:14px; margin-top:4px;">
+      <thead>
+        <tr>
+          <th style="text-align:left; padding:6px 4px; border-bottom:1px solid var(--border);">商品編號</th>
+          <th style="text-align:left; padding:6px 4px; border-bottom:1px solid var(--border);">商品名稱</th>
+          <th style="text-align:right; padding:6px 4px; border-bottom:1px solid var(--border);">單價</th>
+          <th style="text-align:right; padding:6px 4px; border-bottom:1px solid var(--border);">數量</th>
+          <th style="text-align:right; padding:6px 4px; border-bottom:1px solid var(--border);">小計</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr>
+            <td style="padding:6px 4px;">{{ item.id }}</td>
+            <td style="padding:6px 4px;">{{ item.name }}</td>
+            <td style="padding:6px 4px; text-align:right;">${{ item.price }}</td>
+            <td style="padding:6px 4px; text-align:right;">{{ item.qty }}</td>
+            <td style="padding:6px 4px; text-align:right;">${{ item.subtotal }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="text-align:right; margin-top:8px; font-size:15px; font-weight:600;">
+      總金額：${{ recorded_total }}
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <a
+        href="{{ url_for('profile') }}"
+        class="btn btn-ghost btn-sm"
+        style="text-decoration:none;"
+      >
+        回到個人檔案
+      </a>
+      <a
+        href="{{ url_for('products') }}"
+        class="btn btn-primary btn-sm"
+        style="text-decoration:none;"
+      >
+        繼續購物
+      </a>
+    </div>
+  </div>
+{% endblock %}

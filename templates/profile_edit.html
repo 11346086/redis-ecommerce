@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <form
+    action="{{ url_for('profile_edit') }}"
+    method="post"
+    style="max-width:420px; display:flex; flex-direction:column; gap:10px;"
+  >
+    <div class="text-muted" style="font-size:13px;">
+      使用者編號：{{ user_id }}
+    </div>
+
+    <label style="font-size:14px;">
+      姓名：
+      <input
+        type="text"
+        name="name"
+        value="{{ user.name or '' }}"
+        required
+        style="width:100%; margin-top:4px; padding:6px 10px; border-radius:8px; border:1px solid var(--border);"
+      />
+    </label>
+
+    <label style="font-size:14px;">
+      連絡電話：
+      <input
+        type="text"
+        name="phone"
+        value="{{ user.phone or '' }}"
+        style="width:100%; margin-top:4px; padding:6px 10px; border-radius:8px; border:1px solid var(--border);"
+      />
+    </label>
+
+    <label style="font-size:14px;">
+      收件地址：
+      <textarea
+        name="address"
+        rows="3"
+        style="width:100%; margin-top:4px; padding:6px 10px; border-radius:8px; border:1px solid var(--border); resize:vertical;"
+      >{{ user.address or "" }}</textarea>
+    </label>
+
+    <div style="display:flex; gap:8px; margin-top:4px;">
+      <button type="submit" class="btn btn-primary">
+        儲存變更
+      </button>
+      <a
+        href="{{ url_for('profile') }}"
+        class="btn btn-ghost"
+        style="text-decoration:none;"
+      >
+        取消
+      </a>
+    </div>
+  </form>
+{% endblock %}

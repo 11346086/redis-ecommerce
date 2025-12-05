@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{"甜蜜魔法零食小舖・管理後台" }}</title>
+
+    <style>
+      :root {
+        /* 跟前台一樣的主題色，可以微調 */
+        --primary: #f9739b;        /* 甜甜草莓粉 */
+        --primary-soft: #ffe4ef;   /* 淡粉背景 */
+        --accent: #a855f7;         /* 魔法紫 */
+        --bg: #ffeef5;             /* 整體背景 */
+        --card-bg: #ffffff;
+        --text-main: #111827;
+        --text-sub: #6b7280;
+        --border: #fbcfe8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "PingFang TC", "Microsoft JhengHei", sans-serif;
+        margin: 0;
+        background: linear-gradient(135deg, #ffeef5, #fff7ed);
+        color: var(--text-main);
+      }
+
+      .layout {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px 16px 40px;
+      }
+
+      /* ＝＝＝＝＝ 頂部導覽列（這組剛剛應該被弄壞了）＝＝＝＝＝ */
+      .navbar {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 1px 6px rgba(248, 113, 150, 0.18);
+      }
+
+      .navbar-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        font-weight: 800;
+        font-size: 18px;
+        color: var(--accent);
+        letter-spacing: 0.08em;
+      }
+
+      .nav-links a {
+        margin-left: 12px;
+        text-decoration: none;
+        color: var(--text-sub);
+        font-size: 14px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        transition: background 0.15s ease, color 0.15s ease;
+      }
+
+      .nav-links a:hover {
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+
+      .nav-links a.active {
+        background: var(--primary);
+        color: #ffffff;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin: 8px 0 4px;
+      }
+
+      .page-header {
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .page-header-sub {
+        font-size: 14px;
+        color: var(--text-sub);
+      }
+
+      /* ＝＝＝＝＝ flash 訊息 ＝＝＝＝＝ */
+      .flash-wrapper {
+        margin-bottom: 12px;
+      }
+
+      .flash {
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+
+      .flash-success {
+        background: #ecfdf3;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+      }
+
+      .flash-error {
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+      }
+
+      /* ＝＝＝＝＝ 主要卡片容器 ＝＝＝＝＝ */
+      .card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 18px 18px 20px;
+        box-shadow: 0 18px 40px rgba(248, 113, 150, 0.18);
+        border: 1px solid rgba(248, 187, 208, 0.6);
+      }
+
+      /* 表格（商品管理用） */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 6px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid #fee2e2;
+        padding: 8px 6px;
+        text-align: left;
+        font-size: 14px;
+      }
+
+      th {
+        font-weight: 600;
+        color: var(--text-sub);
+        background: #fff7fb;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* 按鈕與輸入框 */
+      .btn {
+        border: none;
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: #ffffff;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 16px;
+        border-radius: 999px;
+        border: none;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(248, 113, 150, 0.35);
+      }
+
+      .btn-primary:hover {
+        background: #fb7185;
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-sub);
+      }
+
+      .btn-ghost:hover {
+        background: #ffe4ef;
+      }
+
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 13px;
+      }
+
+      input[type="number"],
+      input[type="text"] ,
+      input[type="password"]{
+        padding: 8px 8px;
+        border-radius: 999px;
+        border: 1px solid #fecaca;
+        font-size: 13px;
+      }
+
+      input[type="number"]:focus,
+      input[type="text"]:focus ,
+      input[type="password"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 1px rgba(248, 113, 150, 0.45);
+      }
+
+      .text-muted {
+        color: var(--text-sub);
+        font-size: 13px;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        border: 1px solid #fed7e2;
+        font-size: 11px;
+        padding: 2px 8px;
+        color: #db2777;
+        background: #fff1f2;
+      }
+
+      @media (max-width: 640px) {
+        .navbar-inner {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        table {
+          font-size: 13px;
+        }
+        th,
+        td {
+          padding: 6px 4px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 後台導覽列 -->
+    <header class="navbar">
+      <div class="navbar-inner">
+        <div class="brand">🍬甜蜜魔法零食小舖・管理後台🔑</div>
+        <div class="nav-links">
+          <a
+            href="{{ url_for('admin_dashboard') }}"
+            class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}"
+          >總覽</a>
+          <a
+            href="{{ url_for('admin_products') }}"
+            class="{% if request.endpoint == 'admin_products' %}active{% endif %}"
+          >商品管理</a>
+          <a
+            href="{{ url_for('admin_orders') }}"
+            class="{% if request.endpoint in ['admin_orders', 'admin_order_detail'] %}active{% endif %}"
+          >訂單管理</a>
+          <a
+            href="{{ url_for('admin_seckill') }}"
+            class="{% if request.endpoint == 'admin_seckill' %}active{% endif %}"
+          >搶購管理</a>
+          <a href="{{ url_for('admin_logout') }}">登出</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+    {% if request.endpoint != 'admin_login' %}
+      <div class="page-header">
+        <div>
+          <h1>{{ title or "管理後台" }}</h1>
+          {% if subtitle %}
+            <div class="page-header-sub">{{ subtitle }}</div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+      <div class="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="card">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </body>
+</html>

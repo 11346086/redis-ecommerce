@@ -1,0 +1,84 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div style="max-width:520px; margin:0 auto;">
+
+    <form method="post" style="display:flex; flex-direction:column; gap:10px;">
+
+      <div style="margin-bottom:8px;">
+        <label style="display:block; margin-bottom:4px;">限量商品編號</label>
+        <input
+          type="text"
+          name="product_id"
+          class="input-field"
+          style="width:100%;"
+          placeholder="例如：2991"
+          required
+        >
+      </div>
+
+      <div style="margin-bottom:8px;">
+        <label style="display:block; margin-bottom:4px;">限量商品名稱</label>
+        <input
+          type="text"
+          name="product_name"
+          class="input-field"
+          style="width:100%;"
+          placeholder="例如：期間限定草莓夾心餅"
+          required
+        >
+      </div>
+
+      <div style="margin-bottom:8px;">
+        <label style="display:block; margin-bottom:4px;">售價（原價）</label>
+        <input
+          type="number"
+          name="price"
+          min="0"
+          value="0"
+          class="input-field"
+          style="width:100%;"
+        >
+      </div>
+
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <div style="flex:1;">
+          <label style="display:block; margin-bottom:4px;">開始時間</label>
+          <input
+            type="text"
+            name="start"
+            class="input-field"
+            style="width:100%;"
+            placeholder="例如 10:00"
+          >
+        </div>
+        <div style="flex:1;">
+          <label style="display:block; margin-bottom:4px;">結束時間</label>
+          <input
+            type="text"
+            name="end"
+            class="input-field"
+            style="width:100%;"
+            placeholder="例如 11:00"
+          >
+        </div>
+      </div>
+
+      <div style="margin-bottom:8px;">
+        <label style="display:block; margin-bottom:4px;">活動名額</label>
+        <input
+          name="quota"
+          type="number"
+          min="1"
+          value="5"
+          class="input-field"
+          style="width:100%;"
+        >
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:8px;">
+        確定完成！建立
+      </button>
+    </form>
+  </div>
+{% endblock %}
