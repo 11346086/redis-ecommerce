@@ -421,6 +421,7 @@ def admin_new_seckill():
         start_str = request.form.get("start", "").strip()   # 例如 10:00
         end_str   = request.form.get("end", "").strip()     # 例如 11:00
         quota_raw = request.form.get("quota", "0").strip()
+        stock_raw = request.form.get("stock", "0").strip()  # 👈 讀庫存字串
 
         # --- 基本欄位檢查 ---
         if not pid:
@@ -436,6 +437,15 @@ def admin_new_seckill():
             flash("售價必須是非負整數。", "error")
             return redirect(url_for("admin_new_seckill"))
 
+        # 庫存
+        try:
+            stock = int(stock_raw or 0)
+            if stock < 0:
+                raise ValueError
+        except ValueError:
+            flash("庫存必須是 0 或正整數。", "error")
+            return redirect(url_for("admin_new_seckill"))
+
         # 如果 Redis 裡還沒有這個商品，就順便幫你建立一個「限量商品」
         product_key = f"product:{pid}"
         if not r.exists(product_key):
@@ -446,13 +456,19 @@ def admin_new_seckill():
                 "name": name,
                 "price": price,
                 "category": "限量商品",   # 很重要：標成限量商品，前台一般商品不會顯示
+                "stock": stock,           # 👈 新增商品時就帶入庫存
             })
         else:
             # 商品已存在，如果有填新名稱或價格，就順便更新
-            update_data = {"price": price}
+            update_data = {
+                "price": price,
+                "stock": stock,           # 👈 更新商品庫存
+            }
             if name:
                 update_data["name"] = name
             r.hset(product_key, mapping=update_data)
+
+        r.set(f"stock:{pid}", stock)
 
         # --- 解析開始 / 結束時間 ---
         start_t = parse_time_hm(start_str)
@@ -477,9 +493,11 @@ def admin_new_seckill():
             "start": start_str,
             "end": end_str,
             "quota": quota,
+            "stock": stock,   # 額外記在活動設定裡，之後如果要用也看得到
         })
 
         # --- 初始化搶購名額 & 清掉舊的成功名單 ---
+        # 這裡用「名額 quota」來當搶購可用數量，是 OK 的
         r.set(f"seckill:stock:{pid}", quota)
         r.delete(f"seckill:users:{pid}")
 

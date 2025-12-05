@@ -200,22 +200,41 @@
         font-size: 13px;
       }
 
-      input[type="number"],
+      /* input[type="number"],
       input[type="text"] ,
       input[type="password"]{
         padding: 8px 8px;
         border-radius: 999px;
         border: 1px solid #fecaca;
         font-size: 13px;
+      } */
+
+      /* 讓所有 input-field 看起來一樣：粉紅圓框 */
+      .input-field {
+        width: 100%;
+        border-radius: 999px;
+        border: 1px solid #fecaca;     /* 粉紅外框 */
+        padding: 8px 8px;
+        background-color: #fff;
+        box-sizing: border-box;
+        transition: box-shadow 0.15s ease, border-color 0.15s ease;
       }
 
-      input[type="number"]:focus,
+      /* input[type="number"]:focus,
       input[type="text"]:focus ,
       input[type="password"]:focus {
         outline: none;
         border-color: var(--primary);
         box-shadow: 0 0 0 1px rgba(248, 113, 150, 0.45);
-      }
+      } */
+      
+      .input-field:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(248, 113, 150, 0.45);
+    }
+
+
 
       .text-muted {
         color: var(--text-sub);
@@ -236,6 +255,48 @@
         color: #db2777;
         background: #fff1f2;
       }
+
+      .qty-col {
+        text-align: right;
+        padding-right: 40px;  /* 想多拉開一點可以調這個 */
+      }
+
+      /* 統一這張表格的基本樣式 */
+      .order-items-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      /* 基本 padding */
+      .order-items-table th,
+      .order-items-table td {
+        padding: 8px 12px;
+      }
+
+      /* 欄位寬度與對齊 */
+      .order-items-table .col-sku {
+        width: 14%;
+      }
+
+      .order-items-table .col-name {
+        width: 30%;            /* 名稱不要太寬，縮一點 */
+      }
+
+      .order-items-table .col-price {
+        width: 16%;
+      }
+
+      .order-items-table .col-qty {
+        width: 10%;
+        text-align: center;    /* 數量置中，左右留一點空 */
+        padding-left: 8px;     /* 避免太貼單價 */
+      }
+
+      .order-items-table .col-subtotal {
+        width: 20%;
+        text-align: right;     /* 小計靠右 */
+      }
+
 
       @media (max-width: 640px) {
         .navbar-inner {
