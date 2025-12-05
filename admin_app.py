@@ -221,57 +221,63 @@ def admin_update_product(pid):
 @app.route("/admin/orders")
 @admin_required
 def admin_orders():
-    """訂單列表"""
-    order_ids = r.lrange("orders", 0, -1)  # 看你原本怎麼存，通常是這樣
-    # 讓最新的在最上面
-    order_ids = list(reversed(order_ids))
+    """訂單列表（含運費）"""
 
+    # 抓出所有 order:* 的 key
+    order_keys = r.keys("order:*")
     orders = []
-    for oid in order_ids:
-        key = f"order:{oid}"
-        data = r.hgetall(key)
-        if not data:
-            continue
 
-        # 商品金額小計：直接用 checkout 存的 total
-        try:
-            items_total = int(data.get("total", 0))
-        except ValueError:
-            items_total = 0
+    if order_keys:
+        # 從 key 取出訂單編號部分：order:2025... -> 2025...
+        order_ids = [k.split(":", 1)[1] for k in order_keys]
 
-        # 運費：跟前台一樣規則（滿 150 免運，未滿收 60）
-        # 如果你有在檔案上面定義 SHIPPING_THRESHOLD / SHIPPING_FEE，就用那兩個也可以
-        if items_total == 0:
-            shipping_fee = 0
-        elif items_total >= SHIPPING_THRESHOLD:
-            shipping_fee = 0
-        else:
-            shipping_fee = SHIPPING_FEE
+        # 讓新的在上面，因為你的 order_id 是用時間字串
+        order_ids.sort(reverse=True)
 
-        grand_total = items_total + shipping_fee
+        for oid in order_ids:
+            key = f"order:{oid}"
+            data = r.hgetall(key)
+            if not data:
+                continue
 
-        # 商品數量
-        items_json = data.get("items", "{}")
-        try:
-            items_map = json.loads(items_json or "{}")
-        except json.JSONDecodeError:
-            items_map = {}
-        items_count = sum(
-            int(q) for q in items_map.values() if str(q).isdigit()
-        )
+            # 商品金額小計：checkout 存的 total
+            try:
+                items_total = int(data.get("total", 0))
+            except ValueError:
+                items_total = 0
 
-        orders.append(
-            {
-                "id": oid,
-                "created_at": data.get("created_at", ""),
-                "user_id": data.get("user_id", ""),
-                "status": data.get("status", "created"),
-                "items_count": items_count,
-                "items_total": items_total,
-                "shipping_fee": shipping_fee,
-                "grand_total": grand_total,  # ✅ 含運費的金額
-            }
-        )
+            # 運費：跟前台一樣規則（滿 150 免運，未滿收 60）
+            if items_total == 0:
+                shipping_fee = 0
+            elif items_total >= SHIPPING_THRESHOLD:
+                shipping_fee = 0
+            else:
+                shipping_fee = SHIPPING_FEE
+
+            grand_total = items_total + shipping_fee
+
+            # 商品數量
+            items_json = data.get("items", "{}")
+            try:
+                items_map = json.loads(items_json or "{}")
+            except json.JSONDecodeError:
+                items_map = {}
+            items_count = sum(
+                int(q) for q in items_map.values() if str(q).isdigit()
+            )
+
+            orders.append(
+                {
+                    "id": oid,
+                    "created_at": data.get("created_at", ""),
+                    "user_id": data.get("user_id", ""),
+                    "status": data.get("status", "created"),
+                    "items_count": items_count,
+                    "items_total": items_total,
+                    "shipping_fee": shipping_fee,
+                    "grand_total": grand_total,  # ✅ 含運費金額
+                }
+            )
 
     return render_template(
         "admin_orders.html",
