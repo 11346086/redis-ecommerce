@@ -69,13 +69,27 @@
         letter-spacing: 0.03em;
       }
 
+      /* 連結本體 */
       .nav-links a {
-        margin-left: 16px;
         text-decoration: none;
         color: var(--text-sub);
         font-size: 14px;
         padding: 4px 8px;
         border-radius: 999px;
+      }
+
+      /* 兩個群組的容器 */
+      .nav-links {
+        display: flex;
+        gap: 8px 16px;
+        align-items: center;
+      }
+
+      .nav-group-main,
+      .nav-group-account {
+        display: flex;
+        align-items: center;
+        gap: 12px;
       }
 
       .nav-links a:hover {
@@ -88,37 +102,31 @@
         color: #ffffff;
       }
 
-      /* 整個連結列 */
-      .nav-links {
-        display: flex;
-        gap: 8px 16px;
-        align-items: center;
-      }
-
-      /* 兩個群組本身都橫向排列 */
-      .nav-group-main,
-      .nav-group-account {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      /* 手機版：兩列顯示（上面三個，下面兩個） */
+      /* 手機版：兩列顯示（上面三個，下面兩個，全部靠右） */
       @media (max-width: 640px) {
+        .navbar-inner {
+          flex-direction: column;
+          align-items: stretch;   /* 讓 nav-links 可以吃滿寬度 */
+          gap: 8px;
+        }
+
         .nav-links {
-          flex-direction: column;       /* 兩個群組上下排 */
-          align-items: flex-start;
+          flex-direction: column; /* 兩個群組上下排 */
+          align-items: flex-end;  /* 整體靠右 */
           gap: 4px;
+          width: 100%;
         }
 
         .nav-group-main,
         .nav-group-account {
+          justify-content: flex-end; /* 每一排的連結都靠右 */
+          align-items: center;
           gap: 10px;
+          width: 100%;
         }
 
-        /* 把原本的 margin-left 影響稍微減弱一下，手機看起來更集中 */
         .nav-links a {
-          margin-left: 0;
+          margin-left: 0;        /* 取消原本的左邊距 */
         }
       }
 
