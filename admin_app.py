@@ -86,8 +86,13 @@ def admin_dashboard():
     product_count = len(r.keys("product:*"))
     order_count = len(r.keys("order:*"))
 
-    # ✅ 只計算真正的使用者帳號：user:u_ 開頭的 HASH
-    user_count = len(r.keys("user:u_*"))
+    # ✅ 只計算「型態是 HASH」的 user:u_*，跟 Redis Insight 選 HASH 一樣
+    user_keys = [
+        key
+        for key in r.scan_iter("user:u_*")
+        if r.type(key) == b"hash"
+    ]
+    user_count = len(user_keys)
 
     return render_template(
         "admin_dashboard.html",
