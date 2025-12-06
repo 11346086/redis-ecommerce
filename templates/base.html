@@ -88,6 +88,40 @@
         color: #ffffff;
       }
 
+      /* 整個連結列 */
+      .nav-links {
+        display: flex;
+        gap: 8px 16px;
+        align-items: center;
+      }
+
+      /* 兩個群組本身都橫向排列 */
+      .nav-group-main,
+      .nav-group-account {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      /* 手機版：兩列顯示（上面三個，下面兩個） */
+      @media (max-width: 640px) {
+        .nav-links {
+          flex-direction: column;       /* 兩個群組上下排 */
+          align-items: flex-start;
+          gap: 4px;
+        }
+
+        .nav-group-main,
+        .nav-group-account {
+          gap: 10px;
+        }
+
+        /* 把原本的 margin-left 影響稍微減弱一下，手機看起來更集中 */
+        .nav-links a {
+          margin-left: 0;
+        }
+      }
+
       h1 {
         font-size: 24px;
         margin: 8px 0 16px;
@@ -777,31 +811,33 @@
       <div class="navbar-inner">
         <div class="brand">🍬甜蜜魔法零食小舖🛒</div>
         <div class="nav-links">
-          <a
-            href="{{ url_for('products') }}"
-            class="{% if request.endpoint == 'products' %}active{% endif %}"
-            >商品列表</a
-          >
-          <a
-            href="{{ url_for('cart') }}"
-            class="{% if request.endpoint == 'cart' %}active{% endif %}"
-            >購物車</a
-          >
-          <a
-            href="{{ url_for('seckill') }}"
-            class="{% if request.endpoint == 'seckill' %}active{% endif %}"
-            >搶購活動</a
-          >
-          <a 
-            href="{{ url_for('profile') }}"
-            class="{% if request.endpoint in ['profile', 'profile_setup', 'profile_edit', 'order_detail'] %}active{% endif %}"
-            >個人檔案</a
-          >
-          <a 
-            href="{{ url_for('logout') }}"
-            >登出</a
-          >
+          <!-- 第一行：一般功能 -->
+          <div class="nav-group-main">
+            <a
+              href="{{ url_for('products') }}"
+              class="{% if request.endpoint == 'products' %}active{% endif %}"
+            >商品列表</a>
 
+            <a
+              href="{{ url_for('cart') }}"
+              class="{% if request.endpoint == 'cart' %}active{% endif %}"
+            >購物車</a>
+
+            <a
+              href="{{ url_for('seckill') }}"
+              class="{% if request.endpoint == 'seckill' %}active{% endif %}"
+            >搶購活動</a>
+          </div>
+
+          <!-- 第二行：帳號相關 -->
+          <div class="nav-group-account">
+            <a 
+              href="{{ url_for('profile') }}"
+              class="{% if request.endpoint in ['profile', 'profile_setup', 'profile_edit', 'order_detail'] %}active{% endif %}"
+            >個人檔案</a>
+
+            <a href="{{ url_for('logout') }}">登出</a>
+          </div>
         </div>
       </div>
     </header>
