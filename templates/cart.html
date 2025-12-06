@@ -60,6 +60,57 @@
       width: 20%;
     }
 
+        /* 商品圖片：桌機維持 56px，手機再縮小 */
+    .cart-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f3f4f6;
+    }
+
+    /* 手機版調整：圖片小一點、欄位寬度重分配、數量輸入固定寬度 */
+    @media (max-width: 640px) {
+      /* 圖片縮小一點，整列比較輕巧 */
+      .cart-thumb {
+        width: 44px;
+        height: 44px;
+      }
+
+      /* 重新分配欄位寬度，讓單價跟數量靠近一點 */
+      .cart-table th:nth-child(1),
+      .cart-table td:nth-child(1) {
+        width: 42%;
+      }
+
+      .cart-table th:nth-child(2),
+      .cart-table td:nth-child(2) {
+        width: 18%;
+      }
+
+      .cart-table th:nth-child(3),
+      .cart-table td:nth-child(3) {
+        width: 18%;
+      }
+
+      .cart-table th:nth-child(4),
+      .cart-table td:nth-child(4) {
+        width: 22%;
+      }
+
+      /* 數量輸入框：固定寬度，1 位數 / 2 位數都不會被吃掉 */
+      .cart-qty-input {
+        width: 44px;
+        text-align: center;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        padding: 4px 0;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+    }
+
+
   </style>
 
   {# ✅ 只有「有商品時」才顯示跑馬燈 #}
@@ -103,7 +154,7 @@
               <tr>
                 <td>
                   <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:56px; height:56px; border-radius:12px; overflow:hidden; background:#f3f4f6;">
+                    <div class="cart-thumb">
                       <img
                         src="{{ url_for('static', filename='images/products/' ~ item.id ~ '.jpg') }}"
                         alt="{{ item.name }}"
@@ -121,13 +172,14 @@
                 <td>
                   <form action="{{ url_for('cart_update') }}" method="post" style="display:flex; align-items:center; gap:6px;">
                     <input type="hidden" name="product_id" value="{{ item.id }}">
-                    <input
-                      type="number"
-                      name="qty"
-                      min="1"
-                      max="{{ item.stock }}"
-                      value="{{ item.qty }}"
-                    >
+                      <input
+                        type="number"
+                        name="qty"
+                        min="1"
+                        max="{{ item.stock }}"
+                        value="{{ item.qty }}"
+                        class="cart-qty-input"
+                      >
                     <button type="submit" class="btn btn-ghost btn-sm">更新</button>
                   </form>
                 </td>
