@@ -33,20 +33,6 @@ def require_user():
     return user_id, None
 
 
-# from datetime import datetime, time 
-
-# 多個搶購活動設定：key 是商品編號
-# SECKILL_EVENTS = {
-#     "2991": {  # 草莓夾心餅
-#         "start": time(10, 0),  # 10:00
-#         "end": time(11, 0),    # 11:00
-#     },
-#     "2992": {  # 巧克力夾心餅
-#         "start": time(14, 0),  # 14:00
-#         "end": time(15, 0),    # 15:00
-#     },
-# }
-
 from datetime import datetime, time
 
 def load_seckill_config():
@@ -75,14 +61,6 @@ def load_seckill_config():
 
     return events
 
-
-# def is_seckill_open_for(product_id: str) -> bool:
-#     """判斷現在是否在某個商品的搶購活動時間內。"""
-#     cfg = SECKILL_EVENTS.get(product_id)
-#     if not cfg:
-#         return False
-#     now = datetime.now().time()
-#     return cfg["start"] <= now <= cfg["end"]
 
 def is_seckill_open_for(product_id: str) -> bool:
     cfgs = load_seckill_config()

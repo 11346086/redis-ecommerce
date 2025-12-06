@@ -1,101 +1,98 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div style="max-width: 840px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+<div class="profile-card-inner">
 
-    <!-- 標題區 -->
-    <div style="text-align: center; margin-bottom: 4px;">
-      <div style="font-size: 26px; font-weight: 700; letter-spacing: 0.08em;">
-        🎉歡迎來到甜蜜魔法零食小舖🌈！
-      </div>
-      <div style="font-size: 16px; color: var(--text-sub); margin-top: 6px;">
-        購買專屬你的療癒魔法！🪄✨
-      </div>
+  <!-- 標題區 -->
+  <div class="profile-hero">
+    <div class="profile-hero-title">
+      🎉歡迎來到甜蜜魔法零食小舖🌈！
     </div>
-
-    <!-- 註冊 / 登入 兩欄 -->
-    <div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr); gap: 24px; align-items: flex-start; margin-top: 8px;">
-      <!-- 左邊：註冊個人檔案 -->
-      <div>
-        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
-          新朋友先註冊個人檔案
-        </div>
-        <div class="text-muted" style="font-size: 13px; margin-bottom: 10px;">
-          填寫姓名與聯絡方式，我們會幫你記住這組帳號，之後結帳會用到喔。
-        </div>
-
-        <form action="{{ url_for('profile_setup') }}" method="post" style="display:flex; flex-direction:column; gap:10px;">
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <label for="name" style="font-size:14px;">姓名</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); font-size:14px;"
-              placeholder="例如：Melody、Candy"
-            >
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <label for="phone" style="font-size:14px;">聯絡電話</label>
-            <input
-              id="phone"
-              name="phone"
-              type="text"
-              style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); font-size:14px;"
-              placeholder="09xxxxxxxx"
-            >
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <label for="address" style="font-size:14px;">收件地址</label>
-            <input
-              id="address"
-              name="address"
-              type="text"
-              style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); font-size:14px;"
-              placeholder="請輸入完整地址"
-            >
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="margin-top:6px; align-self:flex-start;">
-            註冊並開始購物
-          </button>
-
-          <div class="text-muted" style="font-size:12px; margin-top:2px;">
-            完成註冊後系統會自動建立一組 <code>user id</code>，可在「個人檔案」頁面查看。
-          </div>
-        </form>
-      </div>
-
-      <!-- 右邊：已註冊使用者登入 -->
-      <div style="border-left: 1px solid var(--border); padding-left: 18px;">
-        <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
-          已經有帳號？
-        </div>
-        <div class="text-muted" style="font-size:13px; margin-bottom:10px;">
-          直接輸入你的 <code>user id</code> 登入，<br>
-          可以在「個人檔案」或之前截圖的畫面找到。
-        </div>
-
-        <form action="{{ url_for('login') }}" method="post" style="display:flex; flex-direction:column; gap:10px;">
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <label for="user_id" style="font-size:14px;">user id</label>
-            <input
-              id="user_id"
-              name="user_id"
-              type="text"
-              placeholder="例如：u_1ab2cd34"
-              style="padding:6px 10px; border-radius:8px; border:1px solid var(--border); font-size:14px;"
-            >
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="margin-top:6px; align-self:flex-start;">
-            登入
-          </button>
-        </form>
-      </div>
+    <div class="profile-hero-sub">
+      購買專屬你的療癒魔法！🪄✨
     </div>
   </div>
+
+  <!-- 註冊 / 登入 兩欄 -->
+  <div class="profile-columns">
+    <!-- 左邊：註冊個人檔案 -->
+    <section class="profile-section">
+      <h2 class="profile-section-title">新朋友先註冊個人檔案</h2>
+      <p class="profile-section-sub">
+        填寫姓名與聯絡方式，我們會幫你記住這組帳號，之後結帳會用到喔。
+      </p>
+
+      <form action="{{ url_for('profile_setup') }}" method="post">
+        <div class="profile-form-group">
+          <label for="name" class="profile-label">姓名</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            class="profile-input"
+            required
+            placeholder="例如：Melody、Candy"
+          >
+        </div>
+
+        <div class="profile-form-group">
+          <label for="phone" class="profile-label">聯絡電話</label>
+          <input
+            id="phone"
+            name="phone"
+            type="text"
+            class="profile-input"
+            placeholder="09xxxxxxxx"
+          >
+        </div>
+
+        <div class="profile-form-group">
+          <label for="address" class="profile-label">收件地址</label>
+          <input
+            id="address"
+            name="address"
+            type="text"
+            class="profile-input"
+            placeholder="請輸入完整地址"
+          >
+        </div>
+
+        <button type="submit" class="profile-btn-primary">
+          註冊並開始購物
+        </button>
+
+        <p class="profile-note">
+          完成註冊後系統會自動建立一組 <strong>user id</strong>，
+          可在「個人檔案」頁面查看。
+        </p>
+      </form>
+    </section>
+
+    <!-- 右邊：已註冊使用者登入 -->
+    <section class="profile-section profile-section-right">
+      <h2 class="profile-section-title">已經有帳號？</h2>
+      <p class="profile-section-sub">
+        直接輸入你的 <code>user id</code> 登入，<br>
+        可以在「個人檔案」或之前截圖的畫面找到。
+      </p>
+
+      <form action="{{ url_for('login') }}" method="post">
+        <div class="profile-form-group">
+          <label for="user_id" class="profile-label">user id</label>
+          <input
+            id="user_id"
+            name="user_id"
+            type="text"
+            class="profile-input"
+            placeholder="例如：u_1ab2cd34"
+          >
+        </div>
+
+        <button type="submit" class="profile-btn-primary">
+          登入
+        </button>
+      </form>
+    </section>
+  </div>
+</div>
 {% endblock %}
