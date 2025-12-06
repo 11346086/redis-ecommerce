@@ -26,6 +26,40 @@
       0%   { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
+
+    .cart-table {
+      width: 100%;
+      table-layout: fixed;  /* 讓我們自己決定欄位寬度 */
+    }
+
+    /* 第 1 欄：商品（寬一點） */
+    .cart-table th:nth-child(1),
+    .cart-table td:nth-child(1) {
+      width: 40%;
+    }
+
+    /* 第 2 欄：單價（拉回來+靠左） */
+    .cart-table th:nth-child(2),
+    .cart-table td:nth-child(2) {
+      width: 20%;
+      text-align: left;
+      padding-left: 0;      /* 如果還是太右，可以再設成 0 或負值都行 */
+    }
+
+    /* 其他欄隨便抓個比例就好 */
+    .cart-table th:nth-child(3),
+    .cart-table td:nth-child(3) {
+      width: 20%;
+    }
+
+    .cart-table th:nth-child(4) {
+      width: 20%;
+      padding-left: 24px;
+    }
+    .cart-table td:nth-child(4) {
+      width: 20%;
+    }
+
   </style>
 
   {# ✅ 只有「有商品時」才顯示跑馬燈 #}
@@ -55,13 +89,13 @@
     <div class="cart-layout">
       <!-- 左：購物明細 -->
       <div class="cart-items">
-        <table>
+        <table class="cart-table">
           <thead>
             <tr>
               <th style="width:60%;">商品</th>
-              <th>單價</th>
+              <th >單價</th>
               <th>數量</th>
-              <th class="text-right">小計</th>
+              <th class="text-left">小計</th>
             </tr>
           </thead>
           <tbody>
@@ -83,7 +117,7 @@
                     </div>
                   </div>
                 </td>
-                <td>${{ item.price }}</td>
+                <td class="col-price">${{ item.price }}</td>
                 <td>
                   <form action="{{ url_for('cart_update') }}" method="post" style="display:flex; align-items:center; gap:6px;">
                     <input type="hidden" name="product_id" value="{{ item.id }}">

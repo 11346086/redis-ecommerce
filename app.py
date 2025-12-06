@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time, timedelta
 import json
 import uuid
 
@@ -11,6 +11,10 @@ app.secret_key = "dev-secret-key-please-change"  # 隨便一串字就好，用�
 
 # 改成使用共用的雲端 Redis 連線設定
 r = get_redis_client()
+
+def now_tw():
+    """取得台灣現在時間（Render 用 UTC，所以手動 +8 小時）。"""
+    return datetime.utcnow() + timedelta(hours=8)
 
 def get_current_user_id():
     """從 session 取得目前使用者 id，沒有的話回傳 None。"""
@@ -31,9 +35,6 @@ def require_user():
     if not user_id:
         return None, redirect(url_for("profile_setup"))
     return user_id, None
-
-
-from datetime import datetime, time
 
 def load_seckill_config():
     """從 Redis 讀所有搶購活動設定，回傳 dict: {pid: {'start': time, 'end': time}}"""
@@ -67,7 +68,9 @@ def is_seckill_open_for(product_id: str) -> bool:
     cfg = cfgs.get(product_id)
     if not cfg:
         return False
-    now = datetime.now().time()
+
+    # 用台灣時間來判斷活動是否開放
+    now = now_tw().time()
     return cfg["start"] <= now <= cfg["end"]
 
 
