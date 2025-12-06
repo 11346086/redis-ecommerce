@@ -38,20 +38,21 @@
       width: 40%;
     }
 
-    /* 第 2 欄：單價（拉回來+靠左） */
+    /* 第 2 欄：單價 */
     .cart-table th:nth-child(2),
     .cart-table td:nth-child(2) {
       width: 20%;
       text-align: left;
-      padding-left: 0;      /* 如果還是太右，可以再設成 0 或負值都行 */
+      padding-left: 0;
     }
 
-    /* 其他欄隨便抓個比例就好 */
+    /* 第 3 欄：數量 */
     .cart-table th:nth-child(3),
     .cart-table td:nth-child(3) {
       width: 20%;
     }
 
+    /* 第 4 欄：小計 */
     .cart-table th:nth-child(4) {
       width: 20%;
       padding-left: 24px;
@@ -60,7 +61,7 @@
       width: 20%;
     }
 
-        /* 商品圖片：桌機維持 56px，手機再縮小 */
+    /* 商品圖片：桌機維持 56px，手機再縮小 */
     .cart-thumb {
       width: 56px;
       height: 56px;
@@ -73,44 +74,54 @@
     @media (max-width: 640px) {
       /* 圖片縮小一點，整列比較輕巧 */
       .cart-thumb {
-        width: 44px;
-        height: 44px;
+        width: 42px;
+        height: 42px;
+      }
+
+      /* 表格整體字再小一點 */
+      .cart-table {
+        font-size: 13px;
+      }
+
+      .cart-table th,
+      .cart-table td {
+        padding: 6px 3px;
       }
 
       /* 重新分配欄位寬度，讓單價跟數量靠近一點 */
       .cart-table th:nth-child(1),
       .cart-table td:nth-child(1) {
-        width: 42%;
+        width: 48%;
       }
 
       .cart-table th:nth-child(2),
       .cart-table td:nth-child(2) {
-        width: 18%;
+        width: 16%;
+        text-align: right;   /* 單價靠右，貼近數量欄 */
+        padding-right: 4px;
       }
 
       .cart-table th:nth-child(3),
       .cart-table td:nth-child(3) {
-        width: 18%;
+        width: 16%;
       }
 
       .cart-table th:nth-child(4),
       .cart-table td:nth-child(4) {
-        width: 22%;
+        width: 20%;
       }
 
       /* 數量輸入框：固定寬度，1 位數 / 2 位數都不會被吃掉 */
       .cart-qty-input {
-        width: 44px;
+        width: 52px;
         text-align: center;
         border-radius: 999px;
         border: 1px solid var(--border);
-        padding: 4px 0;
+        padding: 4px 4px;
         font-size: 14px;
         box-sizing: border-box;
       }
     }
-
-
   </style>
 
   {# ✅ 只有「有商品時」才顯示跑馬燈 #}
@@ -144,7 +155,7 @@
           <thead>
             <tr>
               <th style="width:60%;">商品</th>
-              <th >單價</th>
+              <th>單價</th>
               <th>數量</th>
               <th class="text-left">小計</th>
             </tr>
@@ -172,14 +183,14 @@
                 <td>
                   <form action="{{ url_for('cart_update') }}" method="post" style="display:flex; align-items:center; gap:6px;">
                     <input type="hidden" name="product_id" value="{{ item.id }}">
-                      <input
-                        type="number"
-                        name="qty"
-                        min="1"
-                        max="{{ item.stock }}"
-                        value="{{ item.qty }}"
-                        class="cart-qty-input"
-                      >
+                    <input
+                      type="number"
+                      name="qty"
+                      min="1"
+                      max="{{ item.stock }}"
+                      value="{{ item.qty }}"
+                      class="cart-qty-input"
+                    >
                     <button type="submit" class="btn btn-ghost btn-sm">更新</button>
                   </form>
                 </td>
@@ -221,7 +232,7 @@
             {% endif %}
           </span>
         </div>
-        <div style="font-size:16px; font-weight:700; margin-bottom:14px; display:flex; justify-content:space-between;">        
+        <div style="font-size:16px; font-weight:700; margin-bottom:14px; display:flex; justify-content:space-between;">
           <span>應付金額</span>
           <span>${{ grand_total }}</span>
         </div>

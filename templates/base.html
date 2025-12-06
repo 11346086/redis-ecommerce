@@ -846,6 +846,20 @@
         }
       }
 
+      /* 手機版：購物車的數量輸入框調整（只影響 cart 頁面） */
+      @media (max-width: 640px) {
+        .cart-qty-input {
+          width: 52px;              /* 兩位數（18、88）也不會被吃掉 */
+          text-align: center;
+          border-radius: 999px;
+          border: 1px solid var(--border);
+          padding: 4px 4px;
+          font-size: 14px;
+          box-sizing: border-box;
+        }
+      }
+
+
     </style>
   </head>
   <body>
