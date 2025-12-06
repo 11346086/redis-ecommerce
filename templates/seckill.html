@@ -19,9 +19,15 @@
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
           <div>
             <div class="text-muted" style="font-size:13px;">活動商品</div>
+              <!-- 第一行：商品名稱 -->
             <div style="font-size:16px; font-weight:600;">
-              {{ e.product_name }}（編號 {{ e.product_id }}）
+              {{ e.product_name }}
             </div>
+            <!-- 第二行：編號 -->
+            <div class="text-muted" style="font-size:13px; margin-top:2px;">
+              編號：{{ e.product_id }}
+            </div>
+            <!-- 第三行：原價＋活動時間 -->
             <div class="text-muted" style="font-size:13px; margin-top:2px;">
               原價：${{ e.price }}　
               活動時間：{{ e.start_time }} ~ {{ e.end_time }}
