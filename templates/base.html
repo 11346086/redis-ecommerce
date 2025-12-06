@@ -804,6 +804,35 @@
         }
       }
 
+      /* 手機版商品卡片：維持左圖右字，只是縮小圖片與間距 */
+      @media (max-width: 640px) {
+        /* 整體左右 padding 再收窄一點，騰出空間給內容 */
+        .layout {
+          padding: 16px 10px 32px;
+        }
+
+        .product-main {
+          padding: 14px 10px;   /* 比桌機版小一點 */
+          gap: 10px;            /* 圖片跟文字的空隙縮小 */
+        }
+
+        .product-thumb {
+          width: 110px;         /* 手機把圖片寬度從 140px 調小一點 */
+        }
+
+        .product-info {
+          min-width: 0;         /* 讓右邊文字區可以自己縮，不會把整張卡片撐爆 */
+        }
+
+        .product-title {
+          font-size: 16px;      /* 標題稍微小一點 */
+        }
+
+        .product-price {
+          font-size: 15px;
+        }
+      }
+
     </style>
   </head>
   <body>
