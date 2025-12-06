@@ -85,7 +85,9 @@ def admin_logout():
 def admin_dashboard():
     product_count = len(r.keys("product:*"))
     order_count = len(r.keys("order:*"))
-    user_count = len(r.keys("user:*"))
+
+    # ✅ 只計算真正的使用者帳號：user:u_ 開頭的 HASH
+    user_count = len(r.keys("user:u_*"))
 
     return render_template(
         "admin_dashboard.html",
