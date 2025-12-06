@@ -833,6 +833,18 @@
         }
       }
 
+      /* 手機版商品卡片：高度跟著內容走，避免下面留一大塊空白 */
+      @media (max-width: 640px) {
+        .product-card {
+          min-height: 0;                 /* 把原本 180px 的限制取消 */
+        }
+
+        /* 順便讓內距上下比較平均一點 */
+        .product-main {
+          padding: 16px 10px 16px;       /* 上下 16px，左右 10px */
+        }
+      }
+
     </style>
   </head>
   <body>
