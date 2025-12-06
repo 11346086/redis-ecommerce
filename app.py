@@ -225,8 +225,6 @@ def get_seckill_status_list():
     return events
 
 
-from redis.exceptions import WatchError  # 應該前面 checkout 那邊就有匯入了
-
 def seckill_attempt(product_id: str, user_id: str) -> str:
     """
     嘗試參加某一個商品的搶購。
@@ -258,9 +256,6 @@ def seckill_attempt(product_id: str, user_id: str) -> str:
             pipe.sadd(users_key, user_id)     # 成功名單加入
 
             # 建立搶購訂單
-            from datetime import datetime
-            import json
-
             order_id = datetime.now().strftime("%Y%m%d%H%M%S%f")
             order_key = f"seckill:order:{order_id}"
 
@@ -275,6 +270,27 @@ def seckill_attempt(product_id: str, user_id: str) -> str:
             pipe.rpush(f"user:{user_id}:seckill_orders", order_id)
 
             pipe.execute()
+
+        # 3) Transaction 成功之後，再發 Pub/Sub & Streams 事件
+
+        # Pub/Sub：讓 subscriber.py 即時看到搶購成功
+        notice = {
+            "type": "seckill_success",
+            "user_id": user_id,
+            "product_id": product_id,
+            "time": datetime.now().isoformat(timespec="seconds"),
+        }
+        r.publish("channel:seckill", json.dumps(notice, ensure_ascii=False))
+
+        # Streams：寫一筆搶購成功事件，給 view_streams.py 查看
+        r.xadd(
+            "stream:seckill",
+            {
+                "user_id": user_id,
+                "product_id": product_id,
+                "result": "success",
+            }
+        )
 
         return "ok"
 
@@ -905,6 +921,26 @@ def checkout():
 
         # 交易成功後，丟進 queue，給 worker_orders.py 用（如果有開）
         r.rpush("queue:orders", order_id)
+
+        # ✅ 發 Pub/Sub 訂單通知（讓 subscriber.py 看得到 Web 產生的訂單）
+        notice = {
+            "type": "order_created",
+            "order_id": order_id,
+            "user_id": user_id,
+            "total": total,
+        }
+        r.publish("channel:orders", json.dumps(notice, ensure_ascii=False))
+
+        # ✅ 將訂單事件寫入 Stream（讓 view_streams.py 也看得到）
+        r.xadd(
+            "stream:orders",
+            {
+                "order_id": order_id,
+                "user_id": user_id,
+                "total": str(total),
+                "status": "created",
+            }
+        )
 
         flash(f"結帳成功！訂單編號：{order_id}", "success")
     except WatchError:

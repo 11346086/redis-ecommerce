@@ -17,15 +17,15 @@ def show_seckill_status():
     stock = int(r.get(SECKILL_STOCK_KEY) or 0)
     success_count = r.scard(SECKILL_USERS_KEY)
 
-    print("\n=== 秒殺活動狀態 ===")
+    print("\n=== 搶購活動狀態 ===")
     print(f"商品：{SECKILL_PRODUCT_ID} {info.get('name')}（原價 ${info.get('price')}）")
-    print(f"秒殺剩餘名額：{stock}")
+    print(f"搶購剩餘名額：{stock}")
     print(f"目前成功人數：{success_count}")
 
 
 def seckill_attempt(user_id: str):
     """
-    執行一次秒殺嘗試：
+    執行一搶購嘗試：
     - 確保每個 user 只能成功一次
     - 確保庫存不會超賣（用 WATCH / MULTI / EXEC）
     """
@@ -55,7 +55,7 @@ def seckill_attempt(user_id: str):
                 # 把 user 加進成功名單
                 pipe.sadd(SECKILL_USERS_KEY, user_id)
 
-                # （選擇性）建立一筆秒殺訂單紀錄
+                # （選擇性）建立一筆搶購訂單紀錄
                 order_id = datetime.now().strftime("SK%Y%m%d%H%M%S%f")
                 order_key = f"seckill:order:{order_id}"
                 order_data = {
@@ -68,7 +68,7 @@ def seckill_attempt(user_id: str):
 
                 pipe.execute()
 
-                # 秒殺成功後發一則 Pub/Sub 通知
+                # 搶購成功後發一則 Pub/Sub 通知
                 notice = {
                     "type": "seckill_success",
                     "user_id": user_id,
@@ -97,7 +97,7 @@ def seckill_attempt(user_id: str):
             continue
 
 def show_success_users():
-    print("\n=== 秒殺成功名單 ===")
+    print("\n===搶購成功名單 ===")
     users = r.smembers(SECKILL_USERS_KEY)
     if not users:
         print("目前還沒有成功紀錄。")
@@ -108,10 +108,10 @@ def show_success_users():
 
 
 def show_seckill_orders():
-    print("\n=== 秒殺訂單列表 ===")
+    print("\n=== 搶購訂單列表 ===")
     order_ids = r.lrange("seckill:orders", 0, -1)
     if not order_ids:
-        print("目前沒有秒殺訂單。")
+        print("目前沒有搶購訂單。")
         return
 
     for oid in order_ids:
@@ -125,11 +125,11 @@ def show_seckill_orders():
 
 def main():
     while True:
-        print("\n=== 秒殺測試 CLI ===")
-        print("1. 查看秒殺活動狀態")
-        print("2. 嘗試秒殺")
-        print("3. 查看秒殺成功名單")
-        print("4. 查看秒殺訂單列表")
+        print("\n=== 搶購測試 CLI ===")
+        print("1. 查看搶購活動狀態")
+        print("2. 嘗試搶購")
+        print("3. 查看搶購成功名單")
+        print("4. 查看搶購訂單列表")
         print("0. 離開")
 
         choice = input("請選擇功能：").strip()
@@ -144,13 +144,13 @@ def main():
 
             result = seckill_attempt(user_id)
             if result == "success":
-                print("✅ 恭喜！秒殺成功 🎉")
+                print("✅ 恭喜！搶購成功 🎉")
             elif result == "already":
                 print("⚠️ 你已經搶購成功過一次了，不能重複搶。")
             elif result == "soldout":
                 print("❌ 很可惜，名額已經被搶光了。")
             else:
-                print("❌ 秒殺結果未知，請稍後再試。")
+                print("❌ 搶購結果未知，請稍後再試。")
         elif choice == "3":
             show_success_users()
         elif choice == "4":
