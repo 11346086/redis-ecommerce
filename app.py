@@ -152,43 +152,6 @@ def get_cart():
     return items, total
 
 
-# def get_seckill_status_list():
-#     """取得所有搶購活動的狀態（多個商品）。"""
-#     events = []
-
-#     for pid, cfg in SECKILL_EVENTS.items():
-#         info = r.hgetall(f"product:{pid}")
-#         product_name = info.get("name", f"商品 {pid}")
-#         price = info.get("price", "?")
-
-#         stock_key = f"seckill:stock:{pid}"
-#         users_key = f"seckill:users:{pid}"
-
-#         stock = int(r.get(stock_key) or 0)  # 剩餘名額
-#         success_users = sorted(list(r.smembers(users_key)))
-#         success_count = len(success_users)
-#         total_quota = success_count + stock  # 總名額
-
-#         open_now = is_seckill_open_for(pid)
-
-#         events.append(
-#             {
-#                 "product_id": pid,
-#                 "product_name": product_name,
-#                 "price": price,
-#                 "stock": stock,
-#                 "success_count": success_count,
-#                 "total_quota": total_quota,
-#                 "start_time": cfg["start"].strftime("%H:%M"),
-#                 "end_time": cfg["end"].strftime("%H:%M"),
-#                 "open_now": open_now,
-#             }
-#         )
-
-#     # 可以照商品編號排序
-#     events.sort(key=lambda e: e["product_id"])
-#     return events
-
 def get_seckill_status_list():
     """取得所有搶購活動狀態（從 Redis 設定來）。"""
     cfgs = load_seckill_config()
@@ -878,7 +841,6 @@ def checkout():
                 qty = int(qty_str)
                 if current_stocks[pid] < qty:
                     shortage.append((pid, current_stocks[pid], qty))
-
             if shortage:
                 pipe.unwatch()
                 msg_lines = ["庫存不足，無法結帳："]
@@ -888,7 +850,7 @@ def checkout():
                     msg_lines.append(f"{name} 需要 {need}，目前只有 {have}")
                 flash("；".join(msg_lines), "error")
                 return redirect(url_for("cart"))
-
+            
             # 4) 開始交易：扣庫存 + 建訂單 + 清空購物車
             pipe.multi()
 
@@ -901,7 +863,6 @@ def checkout():
             order_id = datetime.now().strftime("%Y%m%d%H%M%S%f")
             order_key = f"order:{order_id}"
 
-            # ✅ 這裡用「目前登入的 user_id」，不要再用 CURRENT_USER_ID
             order_data = {
                 "user_id": user_id,
                 "items": json.dumps(cart_items),
