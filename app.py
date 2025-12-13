@@ -4,17 +4,29 @@ import uuid
 
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from redis.exceptions import WatchError
-from config_redis import get_redis_client  
+from config_redis import get_redis_client
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key-please-change"  # 隨便一串字就好，用來支援 flash 訊息
 
-# 改成使用共用的雲端 Redis 連線設定
+# 使用共用的雲端 Redis 連線設定
 r = get_redis_client()
+
 
 def now_tw():
     """取得台灣現在時間（Render 用 UTC，所以手動 +8 小時）。"""
     return datetime.utcnow() + timedelta(hours=8)
+
+
+def now_tw_iso():
+    """台灣時間的 ISO 字串，例如 2025-12-09T21:30:00。"""
+    return now_tw().isoformat(timespec="seconds")
+
+
+def now_tw_order_id():
+    """用台灣時間做出訂單編號用的時間字串。"""
+    return now_tw().strftime("%Y%m%d%H%M%S%f")
+
 
 def get_current_user_id():
     """從 session 取得目前使用者 id，沒有的話回傳 None。"""
@@ -24,6 +36,7 @@ def get_current_user_id():
 def get_cart_key():
     """每個使用者有自己的購物車 key。"""
     return f"cart:{get_current_user_id()}"
+
 
 def require_user():
     """
@@ -36,6 +49,7 @@ def require_user():
         return None, redirect(url_for("profile_setup"))
     return user_id, None
 
+
 def load_seckill_config():
     """從 Redis 讀所有搶購活動設定，回傳 dict: {pid: {'start': time, 'end': time}}"""
     events = {}
@@ -46,7 +60,7 @@ def load_seckill_config():
             continue
 
         start = cfg.get("start")
-        end   = cfg.get("end")
+        end = cfg.get("end")
         if not start or not end:
             continue
 
@@ -55,7 +69,7 @@ def load_seckill_config():
             eh, em = [int(x) for x in end.split(":")]
             events[pid] = {
                 "start": time(sh, sm),
-                "end":   time(eh, em),
+                "end": time(eh, em),
             }
         except Exception:
             continue
@@ -74,7 +88,6 @@ def is_seckill_open_for(product_id: str) -> bool:
     return cfg["start"] <= now <= cfg["end"]
 
 
-
 def get_products_by_category():
     """從 Redis 抓出商品，依分類整理成 dict。"""
     product_keys = r.keys("product:*")
@@ -91,7 +104,7 @@ def get_products_by_category():
         stock = int(r.get(f"stock:{pid}") or 0)
         category = info.get("category", "未分類")
 
-        # 👇很重要：限量商品只給搶購用，不出現在一般商品列表
+        # 限量商品只給搶購用，不出現在一般商品列表
         if category == "限量商品":
             continue
 
@@ -102,7 +115,6 @@ def get_products_by_category():
             "stock": stock,
             "category": category,
             "image_url": f"images/products/{pid}.jpg",
-            
             "net_weight": info.get("net_weight"),
             "mfg": info.get("mfg"),
             "exp": info.get("exp"),
@@ -112,7 +124,6 @@ def get_products_by_category():
         products_by_cat.setdefault(category, []).append(product_data)
 
     return products_by_cat
-
 
 
 def get_cart():
@@ -172,17 +183,19 @@ def get_seckill_status_list():
 
         open_now = is_seckill_open_for(pid)
 
-        events.append({
-            "product_id": pid,
-            "product_name": product_name,
-            "price": price,
-            "stock": stock,
-            "success_count": success_count,
-            "total_quota": total_quota,
-            "start_time": cfg["start"].strftime("%H:%M"),
-            "end_time": cfg["end"].strftime("%H:%M"),
-            "open_now": open_now,
-        })
+        events.append(
+            {
+                "product_id": pid,
+                "product_name": product_name,
+                "price": price,
+                "stock": stock,
+                "success_count": success_count,
+                "total_quota": total_quota,
+                "start_time": cfg["start"].strftime("%H:%M"),
+                "end_time": cfg["end"].strftime("%H:%M"),
+                "open_now": open_now,
+            }
+        )
 
     events.sort(key=lambda e: e["product_id"])
     return events
@@ -215,17 +228,17 @@ def seckill_attempt(product_id: str, user_id: str) -> str:
 
             # 2) 開始交易：扣名額 + 寫入成功名單 + 建立搶購訂單
             pipe.multi()
-            pipe.decr(stock_key)              # 名額 -1
-            pipe.sadd(users_key, user_id)     # 成功名單加入
+            pipe.decr(stock_key)  # 名額 -1
+            pipe.sadd(users_key, user_id)  # 成功名單加入
 
             # 建立搶購訂單
-            order_id = datetime.now().strftime("%Y%m%d%H%M%S%f")
+            order_id = now_tw_order_id()
             order_key = f"seckill:order:{order_id}"
 
             order_data = {
                 "product_id": product_id,
                 "user_id": user_id,
-                "created_at": datetime.now().isoformat(timespec="seconds"),
+                "created_at": now_tw_iso(),
             }
 
             pipe.hset(order_key, mapping=order_data)
@@ -241,7 +254,7 @@ def seckill_attempt(product_id: str, user_id: str) -> str:
             "type": "seckill_success",
             "user_id": user_id,
             "product_id": product_id,
-            "time": datetime.now().isoformat(timespec="seconds"),
+            "time": now_tw_iso(),
         }
         r.publish("channel:seckill", json.dumps(notice, ensure_ascii=False))
 
@@ -252,7 +265,7 @@ def seckill_attempt(product_id: str, user_id: str) -> str:
                 "user_id": user_id,
                 "product_id": product_id,
                 "result": "success",
-            }
+            },
         )
 
         return "ok"
@@ -279,8 +292,9 @@ def profile_setup():
         phone = request.form.get("phone", "").strip()
         address = request.form.get("address", "").strip()
 
-        if not name:
-            flash("請輸入姓名。", "error")
+        # 三個欄位任何一個沒填，都不給過
+        if not name or not phone or not address:
+            flash("請完整填寫姓名、電話與地址。", "error")
             return redirect(url_for("profile_setup"))
 
         # 建一個簡單的 user_id
@@ -290,12 +304,15 @@ def profile_setup():
         session["user_id"] = user_id
 
         # 存到 Redis：user:{user_id}
-        r.hset(f"user:{user_id}", mapping={
-            "name": name,
-            "phone": phone,
-            "address": address,
-            "created_at": datetime.now().isoformat(timespec="seconds"),
-        })
+        r.hset(
+            f"user:{user_id}",
+            mapping={
+                "name": name,
+                "phone": phone,
+                "address": address,
+                "created_at": now_tw_iso(),
+            },
+        )
 
         flash("個人檔案建立完成，歡迎來逛逛～", "success")
         return redirect(url_for("products"))
@@ -307,12 +324,6 @@ def profile_setup():
         subtitle="購買專屬你的療癒魔法！🪄✨",
     )
 
-    # GET：顯示表單
-    return render_template(
-        "profile_setup.html",
-        title="建立個人檔案",
-        subtitle="先留下你的基本資料，再開始購物吧",
-    )
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -350,7 +361,7 @@ def profile():
 
     # ==== 歷史訂單：從 user:{user_id}:orders 撈出最近幾筆 ====
     orders_key = f"user:{user_id}:orders"
-    order_ids = r.lrange(orders_key, 0, 19)  # 最多 20 筆，依你需求可調整
+    order_ids = r.lrange(orders_key, 0, 19)  # 最多 20 筆
 
     orders = []
     for oid in order_ids:
@@ -381,21 +392,23 @@ def profile():
             items_dict = json.loads(items_json)
         except json.JSONDecodeError:
             items_dict = {}
-        items_count = sum(int(q) for q in items_dict.values() if str(q).isdigit())
+        items_count = sum(
+            int(q) for q in items_dict.values() if str(q).isdigit()
+        )
 
         orders.append(
             {
                 "id": oid,
-                "items_total": items_total,      # 商品小計（純商品）
-                "shipping_fee": shipping_fee,    # 運費
-                "grand_total": grand_total,      # ✅ 含運費的應付金額
+                "items_total": items_total,  # 商品小計（純商品）
+                "shipping_fee": shipping_fee,  # 運費
+                "grand_total": grand_total,  # 含運費的應付金額
                 "created_at": od.get("created_at", ""),
                 "status": od.get("status", "已建立"),
                 "items_count": items_count,
             }
         )
 
-    # 讓最新的訂單排在最上面（前面 rpush 的話，預設會比較舊在前面）
+    # 讓最新的訂單排在最上面
     orders = list(reversed(orders))
 
     # ==== 搶購活動紀錄：user:{user_id}:seckill_orders ====
@@ -406,7 +419,7 @@ def profile():
     for soid in seckill_order_ids:
         skey = f"seckill:order:{soid}"
         sod = r.hgetall(skey)
-        if not od:
+        if not sod:
             continue
 
         pid = sod.get("product_id")
@@ -414,7 +427,10 @@ def profile():
 
         # 商品名稱
         pinfo = r.hgetall(f"product:{pid}") if pid else {}
-        pname = pinfo.get("name", f"商品 {pid}") if pid else f"商品 {pid}"
+        if pid:
+            pname = pinfo.get("name", f"商品 {pid}") if pinfo else f"商品 {pid}"
+        else:
+            pname = "商品"
 
         seckill_records.append(
             {
@@ -437,6 +453,7 @@ def profile():
         orders=orders,
         seckill_records=seckill_records,
     )
+
 
 @app.route("/profile/edit", methods=["GET", "POST"])
 def profile_edit():
@@ -468,9 +485,9 @@ def profile_edit():
         if created_at:
             data["created_at"] = created_at
         else:
-            data["created_at"] = datetime.now().isoformat(timespec="seconds")
+            data["created_at"] = now_tw_iso()
 
-        data["updated_at"] = datetime.now().isoformat(timespec="seconds")
+        data["updated_at"] = now_tw_iso()
 
         r.hset(user_key, mapping=data)
 
@@ -556,13 +573,6 @@ def order_detail(order_id):
 
     grand_total = items_total + shipping_fee
 
-    # 如果之後你有把「應付金額」存進 hash，就可以這樣讀：
-    # try:
-    #     recorded_total = int(od.get("total", grand_total))
-    # except ValueError:
-    #     recorded_total = grand_total
-    # 現在先不用也沒關係
-
     return render_template(
         "order_detail.html",
         title=f"訂單明細 #{order_id}",
@@ -576,7 +586,6 @@ def order_detail(order_id):
     )
 
 
-
 @app.route("/")
 def index():
     """
@@ -587,7 +596,6 @@ def index():
     if get_current_user_id():
         return redirect(url_for("products"))
     return redirect(url_for("profile_setup"))
-
 
 
 @app.route("/products")
@@ -608,6 +616,7 @@ def products():
         title="商品列表",
         subtitle="依商品分類顯示",
     )
+
 
 @app.route("/add_to_cart", methods=["POST"])
 def add_to_cart():
@@ -666,6 +675,7 @@ def add_to_cart():
     r.hincrby(cart_key, pid, qty)
     flash(f"已將 {name} x {qty} 加入購物車。", "success")
     return redirect(url_for("cart"))
+
 
 @app.route("/cart/update", methods=["POST"])
 def cart_update():
@@ -734,8 +744,8 @@ def cart_remove():
     return redirect(url_for("cart"))
 
 
-SHIPPING_THRESHOLD = 150   # 滿多少免運
-SHIPPING_FEE = 60          # 未滿門檻的運費
+SHIPPING_THRESHOLD = 150  # 滿多少免運
+SHIPPING_FEE = 60  # 未滿門檻的運費
 
 
 @app.route("/cart")
@@ -812,7 +822,7 @@ def checkout():
         flash("購物車是空的，無法結帳。", "error")
         return redirect(url_for("cart"))
 
-    # ✅ 直接在這裡重新計算總金額，不再呼叫 get_cart()
+    # 直接在這裡重新計算總金額
     total = 0
     for pid, qty_str in cart_items.items():
         info = r.hgetall(f"product:{pid}")
@@ -850,7 +860,7 @@ def checkout():
                     msg_lines.append(f"{name} 需要 {need}，目前只有 {have}")
                 flash("；".join(msg_lines), "error")
                 return redirect(url_for("cart"))
-            
+
             # 4) 開始交易：扣庫存 + 建訂單 + 清空購物車
             pipe.multi()
 
@@ -860,7 +870,7 @@ def checkout():
                 pipe.decrby(f"stock:{pid}", qty)
 
             # 建訂單 id
-            order_id = datetime.now().strftime("%Y%m%d%H%M%S%f")
+            order_id = now_tw_order_id()
             order_key = f"order:{order_id}"
 
             order_data = {
@@ -868,11 +878,11 @@ def checkout():
                 "items": json.dumps(cart_items),
                 "total": str(total),
                 "status": "已建立",
-                "created_at": datetime.now().isoformat(timespec="seconds"),
+                "created_at": now_tw_iso(),
             }
 
             pipe.hset(order_key, mapping=order_data)
-            # ✅ 每個使用者自己的訂單列表
+            # 每個使用者自己的訂單列表
             pipe.rpush(f"user:{user_id}:orders", order_id)
 
             # 清空購物車
@@ -883,7 +893,7 @@ def checkout():
         # 交易成功後，丟進 queue，給 worker_orders.py 用（如果有開）
         r.rpush("queue:orders", order_id)
 
-        # ✅ 發 Pub/Sub 訂單通知（讓 subscriber.py 看得到 Web 產生的訂單）
+        # 發 Pub/Sub 訂單通知
         notice = {
             "type": "order_created",
             "order_id": order_id,
@@ -892,7 +902,7 @@ def checkout():
         }
         r.publish("channel:orders", json.dumps(notice, ensure_ascii=False))
 
-        # ✅ 將訂單事件寫入 Stream（讓 view_streams.py 也看得到）
+        # 將訂單事件寫入 Stream
         r.xadd(
             "stream:orders",
             {
@@ -900,7 +910,7 @@ def checkout():
                 "user_id": user_id,
                 "total": str(total),
                 "status": "created",
-            }
+            },
         )
 
         flash(f"結帳成功！訂單編號：{order_id}", "success")
@@ -908,6 +918,7 @@ def checkout():
         flash("結帳過程中庫存被修改，請再試一次。", "error")
 
     return redirect(url_for("cart"))
+
 
 @app.route("/seckill")
 def seckill():
@@ -929,6 +940,7 @@ def seckill():
         user_id=user_id,
         user=user_info,
     )
+
 
 @app.route("/seckill/join", methods=["POST"])
 def seckill_join():
@@ -962,12 +974,12 @@ def seckill_join():
 
     return redirect(url_for("seckill"))
 
+
 @app.route("/logout")
 def logout():
     session.pop("user_id", None)
     flash("已登出。", "success")
     return redirect(url_for("profile_setup"))
-
 
 
 if __name__ == "__main__":

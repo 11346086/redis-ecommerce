@@ -1,0 +1,6 @@
+Canvas-URLs：https://reurl.cc/8b65Yd
+Notion-URLs：https://reurl.cc/4b6XVK
+Google Drive-URLs：https://reurl.cc/laNZxA
+GitHub-URLs：https://github.com/11346086/redis-ecommerce.git
+前台網站網址：https://redis-ecommerce-customer.onrender.com
+後台網站網址：https://redis-ecommerce-admin.onrender.com

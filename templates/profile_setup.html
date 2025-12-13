@@ -19,7 +19,7 @@
     <section class="profile-section">
       <h2 class="profile-section-title">新朋友先註冊個人檔案</h2>
       <p class="profile-section-sub">
-        填寫姓名與聯絡方式，我們會幫你記住這組帳號，之後結帳會用到喔。
+        請完整填寫姓名、聯絡電話與收件地址，我們會幫你記住這組帳號，之後結帳會用到喔。
       </p>
 
       <form action="{{ url_for('profile_setup') }}" method="post">
@@ -42,6 +42,7 @@
             name="phone"
             type="text"
             class="profile-input"
+            required
             placeholder="09xxxxxxxx"
           >
         </div>
@@ -53,6 +54,7 @@
             name="address"
             type="text"
             class="profile-input"
+            required
             placeholder="請輸入完整地址"
           >
         </div>
@@ -85,6 +87,7 @@
             type="text"
             class="profile-input"
             placeholder="例如：u_1ab2cd34"
+            required
           >
         </div>
 
